@@ -25,6 +25,15 @@ MAX_IMAGE_BYTES = 8 * 1024 * 1024
 MAX_VIDEO_BYTES = 40 * 1024 * 1024
 MAX_PAGES = 20
 
+EXTENSIONS = {'.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.png': 'image/png', '.webp': 'image/webp', '.gif': 'image/gif', '.mp4': 'video/mp4', '.webm': 'video/webm'}
+
+def attachment_mime(attachment):
+    mime = str(attachment.get('content_type') or '').split(';')[0].strip().lower()
+    if mime in CONTENT_TYPES:
+        return mime
+    extension = Path(str(attachment.get('filename') or '')).suffix.lower()
+    return EXTENSIONS.get(extension, '')
+
 # Artist IDs are Discord USER IDs, never channel IDs.
 ARTISTS = {
     '444120879526445066': ('gangsi', '강시'),
@@ -136,7 +145,7 @@ def parse_caption(raw, filename):
 
 
 def download_attachment(attachment, destination):
-    mime = (attachment.get('content_type') or '').split(';')[0].strip().lower()
+    mime = attachment_mime(attachment)
     ext = CONTENT_TYPES.get(mime)
     if not ext:
         return None
@@ -202,6 +211,9 @@ def main():
             corrected += 1
     known = {a['id'] for a in artworks}
     new_count = 0
+    inspected_messages = 0
+    found_attachments = 0
+    unsupported_files = 0
     for channel_id, config in channels.items():
         if isinstance(config, str):
             config = {'name': config, 'category': 'other'}
@@ -223,14 +235,18 @@ def main():
             cursor = state.get('cursors', {}).get(source_id)
             messages = get_messages(source_id, token, cursor)
             print(f'Channel {channel_id} / source {source_id}: {len(messages)} new messages')
+            inspected_messages += len(messages)
             for msg in messages:
                 if msg.get('author', {}).get('bot'):
                     continue
                 attachments = msg.get('attachments') or []
+                found_attachments += len(attachments)
                 for attachment in attachments:
-                    mime = (attachment.get('content_type') or '').split(';')[0].lower()
+                    mime = attachment_mime(attachment)
                     ext = CONTENT_TYPES.get(mime)
                     if not ext:
+                        unsupported_files += 1
+                        print(f'SKIP unsupported attachment: {attachment.get("filename", "unknown")} / {attachment.get("content_type", "unknown")}')
                         continue
                     aid = str(attachment['id'])
                     item_id = f'{channel_id}-{msg["id"]}-{aid}'
@@ -279,7 +295,10 @@ def main():
         GALLERY.write_text(json.dumps(gallery, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     # Advance cursors even when new messages contain no images.
     STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
+    print(f'Checked {inspected_messages} messages, found {found_attachments} attachments, skipped {unsupported_files} unsupported files')
     print(f'Imported {new_count} new artworks (images/videos); corrected {corrected} artist credits; total {len(artworks)}')
+    if not artworks:
+        print('NOTICE: No artworks imported. Check SKIP messages, bot channel permissions, and whether media were sent as actual attachments (not just URLs).')
     return 0
 
 
