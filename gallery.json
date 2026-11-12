@@ -1,7 +1,39 @@
 {
   "demo": false,
-  "updatedAt": "2026-11-12T19:34:49.127345+00:00",
+  "updatedAt": "2026-11-12T19:43:48.661717+00:00",
   "artworks": [
+    {
+      "id": "1535642301907345448-1570524491770236990-1570524491849797672",
+      "title": "해적와플",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-art",
+      "channelName": "코너의_미술관",
+      "createdAt": "2026-11-12T19:43:37.772000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1535642301907345448-1570524491770236990-1570524491849797672.jpg",
+      "image": "assets/artworks/1535642301907345448-1570524491770236990-1570524491849797672.jpg",
+      "messageUrl": ""
+    },
+    {
+      "id": "1570523212805181460-1570523378291576934-1570523377913827478",
+      "title": "file 00000000e14482098795306d7f4ac5e6",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-comics",
+      "channelName": "코너의 만화",
+      "createdAt": "2026-11-12T19:39:12.298000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1570523212805181460-1570523378291576934-1570523377913827478.jpg",
+      "image": "assets/artworks/1570523212805181460-1570523378291576934-1570523377913827478.jpg",
+      "messageUrl": ""
+    },
     {
       "id": "1535642301907345448-1570518996879417364-1570518996347002880",
       "title": "67cd12b1 c9fc 4d42 a673 febc8b3c7b55",
