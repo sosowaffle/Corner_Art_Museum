@@ -3,7 +3,7 @@ name: Sync Discord Artworks
 
 on:
   schedule:
-    - cron: '7,17,27,37,47,57 * * * *'
+    - cron: "7,17,27,37,47,57 * * * *"
   workflow_dispatch:
 
 permissions:
@@ -15,29 +15,54 @@ concurrency:
 
 jobs:
   sync:
+    name: Sync Discord Gallery
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
           persist-credentials: true
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: '3.12'
+          python-version: "3.12"
+
+      - name: Check Discord bot token
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        run: |
+          if [ -z "$DISCORD_BOT_TOKEN" ]; then
+            echo "::error::DISCORD_BOT_TOKEN is missing."
+            exit 1
+          fi
+          echo "Bot token is configured."
 
       - name: Fetch artwork from Discord
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-        run: python scripts/sync_discord.py
+        run: |
+          python scripts/sync_discord.py
 
       - name: Commit collected artwork
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A
-          if ! git diff --cached --quiet; then
-            git commit -m "gallery: import new Discord artworks"
-            git push
+
+          git add -- gallery.json sync-state.json
+
+          if [ -d "assets/artworks" ]; then
+            git add -A -- assets/artworks
           fi
+
+          if git diff --cached --quiet; then
+            echo "No new artworks to save."
+            exit 0
+          fi
+
+          git commit -m "gallery: sync Discord artworks"
+          git push origin HEAD:main
+
+          echo "Gallery updated successfully."
