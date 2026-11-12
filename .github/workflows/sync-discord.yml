@@ -1,0 +1,43 @@
+
+name: Sync Discord Artworks
+
+on:
+  schedule:
+    - cron: '7,17,27,37,47,57 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: discord-art-museum-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Fetch artwork from Discord
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        run: python scripts/sync_discord.py
+
+      - name: Commit collected artwork
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add gallery.json sync-state.json assets/artworks/
+          if ! git diff --cached --quiet; then
+            git commit -m "gallery: import new Discord artworks"
+            git push
+          fi
