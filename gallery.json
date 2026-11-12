@@ -1,0 +1,72 @@
+{
+  "demo": true,
+  "updatedAt": null,
+  "artworks": [
+    {
+      "id": "demo-1",
+      "title": "푸른 시간",
+      "description": "다양한 작가들이 자신의 이야기를 남기는 온라인 전시 공간입니다. 실제 디스코드 채널을 연동하면 이 데모 작품은 자동으로 교체됩니다.",
+      "authorId": "101",
+      "authorName": "라온",
+      "category": "illustration",
+      "createdAt": "2026-11-12T10:00:00Z",
+      "image": "assets/demo-1.svg",
+      "messageUrl": ""
+    },
+    {
+      "id": "demo-2",
+      "title": "조용한 오후",
+      "description": "다양한 작가들이 자신의 이야기를 남기는 온라인 전시 공간입니다. 실제 디스코드 채널을 연동하면 이 데모 작품은 자동으로 교체됩니다.",
+      "authorId": "102",
+      "authorName": "새벽",
+      "category": "original",
+      "createdAt": "2026-11-11T10:00:00Z",
+      "image": "assets/demo-2.svg",
+      "messageUrl": ""
+    },
+    {
+      "id": "demo-3",
+      "title": "별이 머문 자리",
+      "description": "다양한 작가들이 자신의 이야기를 남기는 온라인 전시 공간입니다. 실제 디스코드 채널을 연동하면 이 데모 작품은 자동으로 교체됩니다.",
+      "authorId": "103",
+      "authorName": "모래",
+      "category": "fanart",
+      "createdAt": "2026-11-10T10:00:00Z",
+      "image": "assets/demo-3.svg",
+      "messageUrl": ""
+    },
+    {
+      "id": "demo-4",
+      "title": "낯선 산책",
+      "description": "다양한 작가들이 자신의 이야기를 남기는 온라인 전시 공간입니다. 실제 디스코드 채널을 연동하면 이 데모 작품은 자동으로 교체됩니다.",
+      "authorId": "104",
+      "authorName": "유리",
+      "category": "sketch",
+      "createdAt": "2026-11-09T10:00:00Z",
+      "image": "assets/demo-4.svg",
+      "messageUrl": ""
+    },
+    {
+      "id": "demo-5",
+      "title": "초록의 계절",
+      "description": "다양한 작가들이 자신의 이야기를 남기는 온라인 전시 공간입니다. 실제 디스코드 채널을 연동하면 이 데모 작품은 자동으로 교체됩니다.",
+      "authorId": "101",
+      "authorName": "라온",
+      "category": "illustration",
+      "createdAt": "2026-11-08T10:00:00Z",
+      "image": "assets/demo-5.svg",
+      "messageUrl": ""
+    },
+    {
+      "id": "demo-6",
+      "title": "밤의 온도",
+      "description": "다양한 작가들이 자신의 이야기를 남기는 온라인 전시 공간입니다. 실제 디스코드 채널을 연동하면 이 데모 작품은 자동으로 교체됩니다.",
+      "authorId": "102",
+      "authorName": "새벽",
+      "category": "original",
+      "createdAt": "2026-11-07T10:00:00Z",
+      "image": "assets/demo-6.svg",
+      "messageUrl": ""
+    }
+  ]
+}
