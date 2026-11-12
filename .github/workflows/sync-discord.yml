@@ -15,20 +15,77 @@ concurrency:
 
 jobs:
   sync:
-    name: Sync Discord Gallery
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
         with:
-          persist-credentials: true
           fetch-depth: 0
+          persist-credentials: true
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+
+      - name: Restore artwork database
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          path = Path("gallery.json")
+
+          def valid(raw):
+              try:
+                  obj = json.loads(raw)
+                  return (
+                      isinstance(obj, dict)
+                      and isinstance(obj.get("artworks"), list)
+                      and len(obj["artworks"]) > 0
+                      and not obj.get("demo", False)
+                  )
+              except (ValueError, TypeError):
+                  return False
+
+          current = path.read_bytes() if path.exists() else b""
+
+          if valid(current):
+              print("Existing artwork database is valid.")
+          else:
+              print("Searching Git history for artwork database...")
+              history = subprocess.check_output(
+                  ["git", "log", "--format=%H", "--", "gallery.json"],
+                  text=True
+              ).splitlines()
+
+              restored = False
+
+              for commit in history:
+                  try:
+                      data = subprocess.check_output(
+                          ["git", "show", f"{commit}:gallery.json"],
+                          stderr=subprocess.DEVNULL
+                      )
+                  except subprocess.CalledProcessError:
+                      continue
+
+                  if valid(data):
+                      path.write_bytes(data)
+                      count = len(json.loads(data)["artworks"])
+                      print(f"Restored {count} artworks.")
+                      restored = True
+                      break
+
+              if not restored:
+                  raise SystemExit(
+                      "No valid historical gallery.json found. "
+                      "Existing files were left unchanged."
+                  )
+          PY
 
       - name: Check Discord bot token
         env:
@@ -38,7 +95,6 @@ jobs:
             echo "::error::DISCORD_BOT_TOKEN is missing."
             exit 1
           fi
-          echo "Bot token is configured."
 
       - name: Fetch artwork from Discord
         env:
@@ -46,7 +102,7 @@ jobs:
         run: |
           python scripts/sync_discord.py
 
-      - name: Commit collected artwork
+      - name: Save artwork database
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -58,11 +114,9 @@ jobs:
           fi
 
           if git diff --cached --quiet; then
-            echo "No new artworks to save."
+            echo "No changes."
             exit 0
           fi
 
-          git commit -m "gallery: sync Discord artworks"
+          git commit -m "Restore and sync museum artworks"
           git push origin HEAD:main
-
-          echo "Gallery updated successfully."
