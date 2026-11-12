@@ -25,6 +25,14 @@ MAX_IMAGE_BYTES = 8 * 1024 * 1024
 MAX_VIDEO_BYTES = 40 * 1024 * 1024
 MAX_PAGES = 20
 
+# Artist IDs are Discord USER IDs, never channel IDs.
+ARTISTS = {
+    '444120879526445066': ('gangsi', '강시'),
+    '397722270891769858': ('corner', '심심한 코너'),
+    '664976847402172417': ('sosowaffle', '소소와플'),
+}
+
+
 
 def request(url, token=None):
     headers = {'User-Agent': 'CommunityArtMuseum/1.0 (GitHub Actions)'}
@@ -172,6 +180,26 @@ def main():
     gallery = json.loads(GALLERY.read_text(encoding='utf-8')) if GALLERY.exists() else {'artworks': []}
     state = json.loads(STATE.read_text(encoding='utf-8')) if STATE.exists() else {'cursors': {}}
     artworks = [] if gallery.get('demo') else gallery.get('artworks', [])
+    # Initial import recovery: never let stale cursors hide all existing art.
+    # A successful previous run may have advanced cursors without importing media.
+    if not artworks:
+        if state.get('cursors'):
+            print('No real artwork in gallery; rescanning existing channel history.')
+        state = {'cursors': {}}
+    # Fix any previously imported artworks incorrectly attributed by channel.
+    # Preserve uploader credits and leave unidentified uploads unassigned.
+    corrected = 0
+    for artwork in artworks:
+        uploader_id = str(artwork.get('uploaderId') or '')
+        if uploader_id in ARTISTS:
+            artist_id, artist_name = ARTISTS[uploader_id]
+        else:
+            artist_id = uploader_id or 'unassigned'
+            artist_name = str(artwork.get('uploaderName') or '미확인 작가')[:80]
+        if artwork.get('authorId') != artist_id or artwork.get('authorName') != artist_name:
+            artwork['authorId'] = artist_id
+            artwork['authorName'] = artist_name
+            corrected += 1
     known = {a['id'] for a in artworks}
     new_count = 0
     for channel_id, config in channels.items():
@@ -217,16 +245,21 @@ def main():
                     if thread_title and not (msg.get('content') or '').strip():
                         title = thread_title[:100]
                     author = msg.get('author', {})
-                    author_id = str(author.get('id', 'unknown'))
-                    author_name = (msg.get('member', {}).get('nick') or author.get('global_name') or author.get('username') or '익명의 작가')[:80]
+                    uploader_id = str(author.get('id', 'unknown'))
+                    uploader_name = (msg.get('member', {}).get('nick') or author.get('global_name') or author.get('username') or '익명의 업로더')[:80]
+                    # Associate works with actual Discord user identity,
+                    # independent of which of the six channels hosts the work.
+                    artist_id, artist_name = ARTISTS.get(uploader_id, (uploader_id, uploader_name))
                     guild_id = msg.get('guild_id') or '@me'
                     kind = 'video' if mime.startswith('video/') else 'image'
                     artworks.append({
                         'id': item_id,
                         'title': title,
                         'description': description,
-                        'authorId': author_id,
-                        'authorName': author_name,
+                        'authorId': artist_id,
+                        'authorName': artist_name,
+                        'uploaderId': uploader_id,
+                        'uploaderName': uploader_name,
                         'category': category,
                         'channelName': str(config.get('name', '전시실'))[:80],
                         'createdAt': msg.get('timestamp'),
@@ -241,12 +274,12 @@ def main():
                 state.setdefault('cursors', {})[source_id] = str(max(int(m['id']) for m in messages))
     artworks.sort(key=lambda a: a.get('createdAt') or '', reverse=True)
     # No-op runs do not create commits or update displayed timestamp.
-    if new_count:
+    if new_count or corrected or gallery.get('demo'):
         gallery = {'demo': False, 'updatedAt': datetime.now(timezone.utc).isoformat(), 'artworks': artworks}
         GALLERY.write_text(json.dumps(gallery, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
     # Advance cursors even when new messages contain no images.
     STATE.write_text(json.dumps(state, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
-    print(f'Imported {new_count} new artworks (images/videos); total {len(artworks)}')
+    print(f'Imported {new_count} new artworks (images/videos); corrected {corrected} artist credits; total {len(artworks)}')
     return 0
 
 
