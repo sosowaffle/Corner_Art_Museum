@@ -1,1 +1,65 @@
 {}
+name: Apply Visitor Title Edits
+
+on:
+  issues:
+    types:
+      - opened
+
+permissions:
+  contents: write
+  issues: read
+
+concurrency:
+  group: corner-museum-title-edits
+  cancel-in-progress: false
+
+jobs:
+  apply-title:
+    name: Apply artwork title change
+    if: startsWith(github.event.issue.title, '[작품 제목 변경] ')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Prepare title edit request
+        env:
+          ISSUE_PAYLOAD: ${{ toJSON(github.event) }}
+        run: |
+          python -c "import os,pathlib; pathlib.Path('.incoming_title_issue.json').write_text(os.environ['ISSUE_PAYLOAD'], encoding='utf-8')"
+
+      - name: Apply visitor title edit
+        run: |
+          python scripts/apply_title_issue.py
+
+      - name: Save changes to GitHub
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          if [ ! -f title-overrides.json ]; then
+            echo "No title changes to save."
+            exit 0
+          fi
+
+          git add title-overrides.json
+
+          if git diff --cached --quiet; then
+            echo "No changes detected."
+            exit 0
+          fi
+
+          git commit -m "museum: update artwork title"
+          git push origin HEAD:main
+
