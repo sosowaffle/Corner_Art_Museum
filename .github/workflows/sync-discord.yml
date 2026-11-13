@@ -1,35 +1,27 @@
-name: Update Museum Discord Avatars
 
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '21 5 * * *'
-
-permissions:
-  contents: write
-
-jobs:
-  avatars:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
-      - name: Fetch Discord profile pictures
-        env:
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-        run: python scripts/sync_discord_avatars.py
       - name: Commit updated profile pictures
+        shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A -- assets/avatars
-          if ! git diff --cached --quiet; then
-            git commit -m "museum: update Discord character avatars"
-            git pull --rebase origin main
-            git push origin HEAD:main
+
+          mkdir -p assets/avatars
+
+          if [ -d "scripts/assets/avatars" ]; then
+            find scripts/assets/avatars \
+              -maxdepth 1 -type f -name "*.png" \
+              -exec cp {} assets/avatars/ \;
           fi
+
+          git add -A -- assets/avatars/
+
+          if git diff --cached --quiet; then
+            echo "No new profile pictures to save."
+            exit 0
+          fi
+
+          git commit -m "museum: update Discord avatars"
+          git pull --rebase origin main
+          git push origin HEAD:main
+
+          echo "Profile pictures saved successfully."
