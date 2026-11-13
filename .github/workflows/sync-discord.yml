@@ -1,122 +1,35 @@
-
-name: Sync Discord Artworks
+name: Update Museum Discord Avatars
 
 on:
-  schedule:
-    - cron: "7,17,27,37,47,57 * * * *"
   workflow_dispatch:
+  schedule:
+    - cron: '21 5 * * *'
 
 permissions:
   contents: write
 
-concurrency:
-  group: discord-art-museum-sync
-  cancel-in-progress: false
-
 jobs:
-  sync:
+  avatars:
     runs-on: ubuntu-latest
-
+    timeout-minutes: 5
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-          persist-credentials: true
-
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.12"
-
-      - name: Restore artwork database
-        shell: bash
-        run: |
-          python - <<'PY'
-          import json
-          import subprocess
-          from pathlib import Path
-
-          path = Path("gallery.json")
-
-          def valid(raw):
-              try:
-                  obj = json.loads(raw)
-                  return (
-                      isinstance(obj, dict)
-                      and isinstance(obj.get("artworks"), list)
-                      and len(obj["artworks"]) > 0
-                      and not obj.get("demo", False)
-                  )
-              except (ValueError, TypeError):
-                  return False
-
-          current = path.read_bytes() if path.exists() else b""
-
-          if valid(current):
-              print("Existing artwork database is valid.")
-          else:
-              print("Searching Git history for artwork database...")
-              history = subprocess.check_output(
-                  ["git", "log", "--format=%H", "--", "gallery.json"],
-                  text=True
-              ).splitlines()
-
-              restored = False
-
-              for commit in history:
-                  try:
-                      data = subprocess.check_output(
-                          ["git", "show", f"{commit}:gallery.json"],
-                          stderr=subprocess.DEVNULL
-                      )
-                  except subprocess.CalledProcessError:
-                      continue
-
-                  if valid(data):
-                      path.write_bytes(data)
-                      count = len(json.loads(data)["artworks"])
-                      print(f"Restored {count} artworks.")
-                      restored = True
-                      break
-
-              if not restored:
-                  raise SystemExit(
-                      "No valid historical gallery.json found. "
-                      "Existing files were left unchanged."
-                  )
-          PY
-
-      - name: Check Discord bot token
+          python-version: '3.12'
+      - name: Fetch Discord profile pictures
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-        run: |
-          if [ -z "$DISCORD_BOT_TOKEN" ]; then
-            echo "::error::DISCORD_BOT_TOKEN is missing."
-            exit 1
-          fi
-
-      - name: Fetch artwork from Discord
-        env:
-          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-        run: |
-          python scripts/sync_discord.py
-
-      - name: Save artwork database
+        run: python scripts/sync_discord_avatars.py
+      - name: Commit updated profile pictures
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-
-          git add -- gallery.json sync-state.json
-
-          if [ -d "assets/artworks" ]; then
-            git add -A -- assets/artworks
+          git add -A -- assets/avatars
+          if ! git diff --cached --quiet; then
+            git commit -m "museum: update Discord character avatars"
+            git pull --rebase origin main
+            git push origin HEAD:main
           fi
-
-          if git diff --cached --quiet; then
-            echo "No changes."
-            exit 0
-          fi
-
-          git commit -m "Restore and sync museum artworks"
-          git push origin HEAD:main
