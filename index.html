@@ -86,7 +86,7 @@
     .hall-card b,.artist-card b{display:block;font-size:20px;font-weight:600;margin:8px 0}
     .artist-head{display:flex;align-items:center;gap:14px}.artist-symbol{font-size:28px;width:54px;height:54px;display:grid;place-items:center;background:#2e2c27}
 
-    .filters{display:grid;grid-template-columns:minmax(240px,1.3fr) repeat(4,minmax(140px,.8fr));gap:10px;padding:16px;border:1px solid var(--line);background:var(--panel);border-radius:14px}
+    .filters{display:grid;grid-template-columns:minmax(220px,1.3fr) repeat(5,minmax(130px,.8fr));gap:10px;padding:16px;border:1px solid var(--line);background:var(--panel);border-radius:14px}
     .filters input,.filters select{width:100%;padding:12px 14px;border-radius:10px;background:#11110f;border:1px solid var(--line);color:var(--ink)}
     .filters-row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
     .status-line{color:var(--sub);font-size:13px}
@@ -314,6 +314,7 @@
         <input id="search" type="search" placeholder="작품명, 설명, 업로더로 검색" />
         <select id="hall-filter"></select>
         <select id="character-filter"></select>
+        <select id="author-filter" aria-label="올린 작가로 필터링"><option value="all">모든 업로드 작가</option></select>
         <select id="type-filter">
           <option value="all">모든 형식</option>
           <option value="image">이미지</option>
@@ -493,6 +494,8 @@
     $('artist-grid').innerHTML=CHARS.map(c=>`<button class="artist-card" data-char="${c.id}"><div class="artist-head">${avatarHTML(c)}<span><small>CHARACTER VIEW</small><b>${esc(c.name)}</b><span>${artworks.filter(a=>charsOf(a).includes(c.id)).length}개 작품 모아보기</span></span></div></button>`).join('');
     $('hall-filter').innerHTML='<option value="all">모든 전시관</option>'+HALLS.map(h=>`<option value="${h[0]}">${esc(h[1])}</option>`).join('');
     $('character-filter').innerHTML='<option value="all">모든 캐릭터</option>'+CHARS.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')+'<option value="unknown">미분류</option>';
+    // Separate uploader filter for the full archive (not the characters in the artwork).
+    $('author-filter').innerHTML='<option value="all">모든 업로드 작가</option>'+[...new Set(artworks.map(author))].sort((a,b)=>a.localeCompare(b,'ko')).map(name=>`<option value="${esc(name)}">${esc(name)}</option>`).join('');
     $('stat-count').textContent=artworks.length.toLocaleString('ko-KR');
     $('stat-video').textContent=artworks.filter(isVideo).length.toLocaleString('ko-KR');
     $('stat-edit').textContent=(Object.keys(overrides).length + Object.keys(localEdits).length).toLocaleString('ko-KR');
@@ -645,9 +648,10 @@
 
   function filteredArtworks(){
     const q=$('search').value.trim().toLowerCase();
-    const hall=$('hall-filter').value; const char=$('character-filter').value; const type=$('type-filter').value; const sort=$('sort-filter').value;
+    const hall=$('hall-filter').value; const char=$('character-filter').value; const uploader=$('author-filter').value; const type=$('type-filter').value; const sort=$('sort-filter').value;
     let arr=artworks.filter(a=>{
       if(hall!=='all' && a.category!==hall) return false;
+      if(uploader!=='all' && author(a)!==uploader) return false;
       const chars=charsOf(a);
       if(char==='unknown'){ if(chars.length!==0) return false; }
       else if(char!=='all' && !chars.includes(char)) return false;
@@ -669,10 +673,10 @@
   function renderArchive(reset=true){
     if(reset) visibleCount=12;
     current=filteredArtworks();
-    const hall=$('hall-filter').value, char=$('character-filter').value;
+    const hall=$('hall-filter').value, char=$('character-filter').value, uploader=$('author-filter').value;
     $('count-status').textContent=`${current.length}개 작품`;
     $('collection-name').textContent = char!=='all' ? (char==='unknown' ? '캐릭터 미분류 작품' : prettyChar(char)) : (hall!=='all' ? nameHall(hall) : '전체 작품');
-    $('filter-status').textContent = `${hall==='all'?'전체 전시관':nameHall(hall)} · ${char==='all'?'모든 캐릭터':(char==='unknown'?'캐릭터 미분류':prettyChar(char))}`;
+    $('filter-status').textContent = `${hall==='all'?'전체 전시관':nameHall(hall)} · ${char==='all'?'모든 캐릭터':(char==='unknown'?'캐릭터 미분류':prettyChar(char))} · ${uploader==='all'?'모든 업로드 작가':uploader}`;
     $('archive-grid').innerHTML = current.length ? current.slice(0,visibleCount).map(archiveCard).join('') : '<div class="empty">조건에 맞는 작품이 없습니다.</div>';
     $('load-more').hidden = visibleCount >= current.length;
     $('load-more').textContent = `작품 더 보기 (${Math.min(visibleCount,current.length)} / ${current.length})`;
@@ -860,8 +864,8 @@
     $('wall-next').addEventListener('click',()=>{holdAutoTour();$('wall-track').scrollBy({left:520,behavior:'smooth'});});
     $('hall-grid').addEventListener('click',e=>{const b=e.target.closest('[data-hall]'); if(!b) return; $('hall-filter').value=b.dataset.hall; $('character-filter').value='all'; renderArchive(); document.getElementById('archive').scrollIntoView({behavior:'smooth'}); });
     $('artist-grid').addEventListener('click',e=>{const b=e.target.closest('[data-char]'); if(!b) return; $('character-filter').value=b.dataset.char; $('hall-filter').value='all'; renderArchive(); document.getElementById('archive').scrollIntoView({behavior:'smooth'}); });
-    ['search','hall-filter','character-filter','type-filter','sort-filter'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>renderArchive()));
-    $('clear').addEventListener('click',()=>{ $('search').value=''; $('hall-filter').value='all'; $('character-filter').value='all'; $('type-filter').value='all'; $('sort-filter').value='latest'; renderArchive(); });
+    ['search','hall-filter','character-filter','author-filter','type-filter','sort-filter'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>renderArchive()));
+    $('clear').addEventListener('click',()=>{ $('search').value=''; $('hall-filter').value='all'; $('character-filter').value='all'; $('author-filter').value='all'; $('type-filter').value='all'; $('sort-filter').value='latest'; renderArchive(); });
     $('load-more').addEventListener('click',()=>{ visibleCount+=12; renderArchive(false); });
     $('close-lightbox').addEventListener('click',closeLightbox); $('close-lightbox-x').addEventListener('click',closeLightbox); $('prev-art').addEventListener('click',()=>moveLightbox(-1)); $('next-art').addEventListener('click',()=>moveLightbox(1));
     const mat=document.querySelector('.stage-mat');
