@@ -1,3 +1,4 @@
+
 name: Sync Discord Artworks
 
 on:
@@ -58,6 +59,12 @@ jobs:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: python scripts/sync_discord.py
 
+      - name: Verify deleted Discord artworks
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+          DELETION_AUDIT_BATCH: '60'
+        run: python scripts/sync_discord_deletions.py
+
       - name: Update Discord profile pictures
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
@@ -79,6 +86,6 @@ jobs:
             echo 'No changes to save.'
             exit 0
           fi
-          git commit -m 'museum: sync Discord artworks and avatars'
+          git commit -m 'museum: sync Discord artworks, removals, and avatars'
           git pull --rebase origin main
           git push origin HEAD:main
