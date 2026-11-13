@@ -185,6 +185,23 @@
       .topbar{padding:12px 0;flex-wrap:wrap}.hero{padding-top:36px}.hero-stats{grid-template-columns:1fr}.archive-grid,.hall-grid,.artist-grid,.filters{grid-template-columns:1fr}.wall-piece{min-width:180px}.frame-media img,.frame-media video{max-height:300px}.art-card .frame-media img,.art-card .frame-media video{max-height:380px}.lightbox{padding:12px}.stage-mat{padding:10px}
     }
     @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  
+    /* 2026-11: full-resolution vertical reader, accessible close affordance */
+    .light-shell{min-height:0;min-width:0}
+    .stage-panel{min-height:0;overflow:hidden}
+    .stage-frame{min-height:0;overflow:hidden}
+    .stage-mat{min-height:0;max-height:100%;overflow-y:auto!important;overflow-x:auto;overscroll-behavior:contain;scrollbar-width:auto;scrollbar-color:#aa9572 #ded5c5;touch-action:pan-y}
+    .stage-media.scroll{min-height:0!important;height:auto;display:block;text-align:center;overflow:visible}
+    .stage-media.scroll img{display:block;width:auto;max-width:100%;max-height:none!important;height:auto!important;margin:0 auto;object-fit:initial}
+    .stage-media.fit{height:100%;min-height:0}
+    .stage-media.fit img{max-width:100%;max-height:100%!important;height:auto;width:auto;object-fit:contain}
+    .stage-reader-tip{color:var(--gold);font-size:12px;margin:0 0 10px}
+    .lightbox-close-x{position:fixed;z-index:10001;right:14px;top:12px;background:#181715;border:1px solid #d8c49b;color:#f1ede6;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;font-size:25px;line-height:1;box-shadow:0 5px 18px #0009}
+    .lightbox-close-x:hover{background:#4b3e2b}
+    .lightbox .light-shell{padding-top:28px}
+    @media(max-width:1200px){.lightbox .light-shell{height:100%;overflow:auto}.stage-panel{flex:0 0 auto;height:68vh;min-height:420px}.stage-mat{height:100%;min-height:0}}
+    @media(max-width:760px){.lightbox .light-shell{padding-top:38px}.stage-panel{height:65vh;min-height:350px}.stage-frame{min-height:0}.lightbox-close-x{right:10px;top:8px}}
+
   </style>
 </head>
 <body>
@@ -240,7 +257,7 @@
           <span class="pill" id="wall-count">0 works</span>
         </div>
         <div id="wall-track" class="wall-track" aria-label="전체 작품 가로 전시 벽"></div>
-        <div class="wall-load-row"><span id="wall-progress">0 / 0</span><button type="button" class="btn" id="wall-load-more">전시 작품 더 불러오기 →</button></div>
+        <div class="wall-load-row"><span id="wall-progress">0 / 0</span><button type="button" class="btn" id="wall-load-more">전체 작품 전시벽에 펼치기 →</button></div>
       </div>
     </section>
 
@@ -314,6 +331,7 @@
   </footer>
 
   <div id="lightbox" class="lightbox" aria-hidden="true">
+    <button type="button" id="close-lightbox-x" class="lightbox-close-x" aria-label="작품 확대창 닫기" title="닫기">×</button>
     <div class="light-shell">
       <section class="stage-panel">
         <div class="light-top">
@@ -326,6 +344,7 @@
             <button id="close-lightbox" class="ghost-btn">닫기 ✕</button>
           </div>
         </div>
+        <p class="stage-reader-tip" id="stage-reader-tip">마우스 휠로 작품을 아래까지 감상할 수 있어요.</p>
         <div class="stage-frame">
           <div class="stage-mat">
             <div id="stage-media" class="stage-media fit">
@@ -579,6 +598,12 @@
 
   function updateLightbox(){
     const a=viewerList[viewerIndex]; if(!a) return;
+    const scrollingReader=!isVideo(a);
+    $('stage-media').className='stage-media '+(scrollingReader?'scroll':'fit');
+    $('scroll-view').classList.toggle('active',scrollingReader);
+    $('fit-view').classList.toggle('active',!scrollingReader);
+    $('stage-reader-tip').textContent=scrollingReader?'휠을 굴리면 그림이 아래로 이어집니다. 전체 그림을 축소해서 보려면 ‘맞춤 보기’를 누르세요.':'동영상은 재생 버튼으로 감상할 수 있어요.';
+    document.querySelector('.stage-mat').scrollTop=0;
     $('light-position').textContent=`${viewerIndex+1} / ${viewerList.length}`;
     $('detail-title').textContent=displayTitle(a);
     $('detail-hall').textContent=nameHall(a.category);
@@ -666,7 +691,7 @@
     // The pointer-position check also handles elements with unusual stacking.
     const museumWall=document.querySelector('.museum-wall');
     document.addEventListener('wheel',e=>{
-      if(e.ctrlKey || !museumWall) return;
+      if(e.ctrlKey || !museumWall || $('lightbox').classList.contains('open')) return;
       const rect=museumWall.getBoundingClientRect();
       if(e.clientX<rect.left || e.clientX>rect.right || e.clientY<rect.top || e.clientY>rect.bottom) return;
       const rail=$('wall-track');
@@ -682,7 +707,7 @@
       }
       // When the rail reaches either end, allow normal page scrolling.
     },{passive:false,capture:true});
-    $('wall-load-more').addEventListener('click',()=>appendWall(28));
+    $('wall-load-more').addEventListener('click',()=>appendWall(artworks.length));
     $('wall-track').addEventListener('scroll',()=>{
       const rail=$('wall-track');
       if(rail.scrollWidth-rail.clientWidth-rail.scrollLeft<1000) appendWall(28);
@@ -694,9 +719,25 @@
     ['search','hall-filter','character-filter','type-filter','sort-filter'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>renderArchive()));
     $('clear').addEventListener('click',()=>{ $('search').value=''; $('hall-filter').value='all'; $('character-filter').value='all'; $('type-filter').value='all'; $('sort-filter').value='latest'; renderArchive(); });
     $('load-more').addEventListener('click',()=>{ visibleCount+=12; renderArchive(false); });
-    $('close-lightbox').addEventListener('click',closeLightbox); $('prev-art').addEventListener('click',()=>moveLightbox(-1)); $('next-art').addEventListener('click',()=>moveLightbox(1));
-    $('fit-view').addEventListener('click',()=>{ $('stage-media').className='stage-media fit'; $('fit-view').classList.add('active'); $('scroll-view').classList.remove('active');});
-    $('scroll-view').addEventListener('click',()=>{ $('stage-media').className='stage-media scroll'; $('scroll-view').classList.add('active'); $('fit-view').classList.remove('active');});
+    $('close-lightbox').addEventListener('click',closeLightbox); $('close-lightbox-x').addEventListener('click',closeLightbox); $('prev-art').addEventListener('click',()=>moveLightbox(-1)); $('next-art').addEventListener('click',()=>moveLightbox(1));
+    const mat=document.querySelector('.stage-mat');
+    $('fit-view').addEventListener('click',()=>{ $('stage-media').className='stage-media fit'; $('fit-view').classList.add('active'); $('scroll-view').classList.remove('active'); mat.scrollTop=0; });
+    $('scroll-view').addEventListener('click',()=>{ $('stage-media').className='stage-media scroll'; $('scroll-view').classList.add('active'); $('fit-view').classList.remove('active'); mat.scrollTop=0; });
+    mat.addEventListener('wheel',e=>{
+      if(!$('lightbox').classList.contains('open') || $('stage-image').hidden) return;
+      if($('stage-media').classList.contains('fit')){
+        $('stage-media').className='stage-media scroll';
+        $('scroll-view').classList.add('active');
+        $('fit-view').classList.remove('active');
+      }
+      // The overlay uses a fixed viewport: scroll the actual illustration viewport, not the page.
+      if(mat.scrollHeight>mat.clientHeight+1){
+        e.preventDefault();
+        const unit=e.deltaMode===1?18:e.deltaMode===2?mat.clientHeight:1;
+        mat.scrollTop+=e.deltaY*unit;
+        mat.scrollLeft+=e.deltaX*unit;
+      }
+    },{passive:false});
     $('save-char').addEventListener('click',saveCharacterLocal);
     $('save-local').addEventListener('click',applyEditLocal); $('submit-github').addEventListener('click',submitGitHub);
     $('lightbox').addEventListener('click',e=>{ if(e.target === $('lightbox')) closeLightbox(); });
