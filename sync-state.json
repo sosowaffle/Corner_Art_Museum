@@ -21,6 +21,6 @@
   },
   "deletionAudit": {
     "missingConfirmations": {},
-    "offset": 60
+    "offset": 120
   }
 }
