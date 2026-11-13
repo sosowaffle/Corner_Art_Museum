@@ -48,15 +48,28 @@
     .btn.primary:hover{filter:brightness(1.05)}
 
     /* museum wall */
-    .museum-wall{position:relative;background:linear-gradient(180deg,#302d28 0,#25231f 65%,#1a1a18 65%,#1a1a18 100%);border:1px solid var(--line);border-radius:22px;padding:30px 0 22px;overflow:hidden}
-    .museum-wall::before{content:'';position:absolute;inset:0 0 auto 0;height:60%;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));pointer-events:none}
-    .museum-wall::after{content:'';position:absolute;left:0;right:0;bottom:46px;height:10px;background:linear-gradient(90deg,#524838,#7a6a52,#524838)}
-    .wall-guide{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 24px 14px;position:relative;z-index:1}
-    .wall-guide p{margin:0;color:#dfd5c3;font-size:13px}
-    .wall-track{display:flex;align-items:flex-end;gap:34px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#86714d transparent;padding:24px 28px 46px;cursor:grab;position:relative;z-index:1}
-    .wall-track.dragging{cursor:grabbing;scroll-snap-type:none}
-    .wall-piece{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:220px}
-    .wall-caption{font-size:11px;color:#d4c7ae;text-align:center;max-width:260px}
+    /* A perspective museum corridor instead of an ordinary carousel. The wall, floor and ceiling are CSS-only. */
+    .museum-wall{position:relative;isolation:isolate;overflow:hidden;min-height:570px;border:1px solid #655742;border-radius:16px;background:#292722;box-shadow:inset 0 0 0 1px #9c87623d,0 25px 65px #0008}
+    .museum-wall::before{content:'';position:absolute;inset:0 0 38% 0;z-index:-2;pointer-events:none;background:repeating-linear-gradient(90deg,transparent 0 23.8%,#9a896c1e 24%,transparent 24.2% 49.8%,#08080825 50%,transparent 50.2% 75%),linear-gradient(180deg,#4c463c,#39352e 48%,#2b2824 100%)}
+    .museum-wall::after{content:'';position:absolute;z-index:-1;inset:61% 0 0;pointer-events:none;background:repeating-linear-gradient(92deg,transparent 0 17.8%,#b6a58726 18%,transparent 18.2% 36%),linear-gradient(180deg,#3a352e 0%,#1b1a18 95%);clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
+    .museum-ceiling{pointer-events:none;position:absolute;z-index:0;left:0;right:0;top:0;height:62px;background:linear-gradient(180deg,#141413,#39342e 66%,#5c5041 96%,#bb9b67);box-shadow:0 9px 18px #0006}
+    .museum-ceiling::before{content:'';position:absolute;inset:0 8% 10px;background:repeating-linear-gradient(90deg,transparent 0 170px,#aa966e5c 171px 175px,transparent 177px 345px);opacity:.8}
+    .museum-perspective-left,.museum-perspective-right{position:absolute;top:61px;bottom:26%;width:12%;z-index:1;pointer-events:none;background:linear-gradient(90deg,#191816,#342f29);opacity:.75}
+    .museum-perspective-left{left:0;clip-path:polygon(0 0,100% 16%,100% 100%,0 100%)}
+    .museum-perspective-right{right:0;transform:scaleX(-1);clip-path:polygon(0 0,100% 16%,100% 100%,0 100%)}
+    .museum-baseboard{position:absolute;left:0;right:0;top:61%;height:16px;z-index:1;pointer-events:none;background:linear-gradient(180deg,#a38a63,#4b3d2a 40%,#171613);box-shadow:0 9px 20px #0009}
+    .museum-floor-lines{position:absolute;z-index:0;inset:62% 0 0;pointer-events:none;opacity:.43;background:repeating-linear-gradient(180deg,transparent 0 56px,#9c87674d 57px 59px,transparent 60px 120px),repeating-linear-gradient(90deg,transparent 0 17%,#d7bb8666 17.2%,transparent 17.4% 33%);transform:perspective(260px) rotateX(25deg) scale(1.28);transform-origin:center top}
+    .wall-guide{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:94px 28px 0;position:relative;z-index:2}
+    .wall-guide p{margin:0;color:#ece0cb;font-size:13px;text-shadow:0 2px 9px #000}
+    .wall-track{display:flex;align-items:center;gap:56px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#b7a17b6b transparent;padding:36px max(30px,8vw) 98px;cursor:grab;position:relative;z-index:3;user-select:none;touch-action:pan-y;min-height:350px}
+    .wall-track.dragging{cursor:grabbing;scroll-behavior:auto!important}
+    .wall-track.dragging *{pointer-events:none}
+    .wall-track img{-webkit-user-drag:none;user-drag:none}
+    .wall-piece{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-width:230px;max-width:530px;padding:18px 12px 15px;border-inline:1px solid #c5b5951f;position:relative;filter:drop-shadow(0 14px 8px #0007)}
+    .wall-piece::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:135px;height:23px;border-radius:50%;background:radial-gradient(ellipse at 50% 5%,#fff7c3b5,#e8c98938 35%,transparent 72%);filter:blur(4px);pointer-events:none}
+    .wall-piece .frame-wrap{transform:perspective(1100px) rotateY(-2deg);transition:transform .2s}
+    .wall-piece:hover .frame-wrap{transform:perspective(1100px) rotateY(0deg) translateY(-3px)}
+    .wall-caption{font-size:12px;color:#f0e7d5;text-align:center;max-width:340px;background:#171511d9;border:1px solid #bda47965;padding:7px 16px;line-height:1.6;box-shadow:0 3px 10px #0005}
 
     /* adaptive frame */
     .frame-wrap{display:inline-block;padding:13px;border:1px solid #6a5940;background:#2c251e;box-shadow:inset 0 0 0 4px #4f4434,inset 0 0 0 8px #b89e74,0 12px 24px rgba(0,0,0,.35)}
@@ -132,6 +145,7 @@
       .hero{grid-template-columns:1fr}.archive-grid,.hall-grid,.artist-grid{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr 1fr 1fr}.filters > :first-child{grid-column:1/-1}.light-shell{grid-template-columns:1fr;overflow:auto}.stage-panel{min-height:55vh}
     }
     @media (max-width:760px){
+      .museum-wall{min-height:480px}.wall-guide{padding:84px 18px 0}.wall-track{padding:28px 22px 86px;gap:25px}.museum-perspective-left,.museum-perspective-right{width:4%}
       .topbar{padding:12px 0;flex-wrap:wrap}.hero{padding-top:36px}.hero-stats{grid-template-columns:1fr}.archive-grid,.hall-grid,.artist-grid,.filters{grid-template-columns:1fr}.wall-piece{min-width:180px}.frame-media img,.frame-media video{max-height:300px}.art-card .frame-media img,.art-card .frame-media video{max-height:380px}.lightbox{padding:12px}.stage-mat{padding:10px}
     }
     @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
@@ -172,7 +186,7 @@
         <div>
           <div class="eyebrow">01 / MUSEUM WALL</div>
           <h2>마우스로 훑어보는 전시 벽</h2>
-          <p>실제 미술관 외벽을 따라 액자가 걸려 있는 느낌으로, 드래그해서 빠르게 작품을 넘길 수 있어요.</p>
+          <p>실제 전시 복도를 바라보듯 조명이 켜진 벽을 따라 감상해 보세요. 클릭해서 끌고 놓으면 즉시 멈추고, 마우스 휠로도 좌우 이동할 수 있어요.</p>
         </div>
         <div class="buttons">
           <button class="btn" id="wall-prev">← 이전</button>
@@ -180,8 +194,13 @@
         </div>
       </div>
       <div class="museum-wall">
+        <div class="museum-ceiling" aria-hidden="true"></div>
+        <div class="museum-perspective-left" aria-hidden="true"></div>
+        <div class="museum-perspective-right" aria-hidden="true"></div>
+        <div class="museum-baseboard" aria-hidden="true"></div>
+        <div class="museum-floor-lines" aria-hidden="true"></div>
         <div class="wall-guide">
-          <p>액자 크기가 작품 비율을 따라가도록 바꾸었습니다. 잘림 없이 작품이 더 크게 보여요.</p>
+          <p>마우스를 누르고 드래그 → 놓으면 즉시 정지 · 휠로 좌우 이동 · 작품 클릭으로 확대</p>
           <span class="pill" id="wall-count">0 works</span>
         </div>
         <div id="wall-track" class="wall-track" aria-label="가로 전시 벽"></div>
@@ -508,10 +527,47 @@
   }
 
   function enableDragScroll(el){
-    let isDown=false,startX=0,startLeft=0,dragged=false;
-    el.addEventListener('pointerdown',e=>{ if(e.button!==0) return; isDown=true; dragged=false; startX=e.clientX; startLeft=el.scrollLeft; el.classList.add('dragging');});
-    window.addEventListener('pointermove',e=>{ if(!isDown) return; const dx=e.clientX-startX; if(Math.abs(dx)>6) dragged=true; el.scrollLeft=startLeft-dx; });
-    window.addEventListener('pointerup',()=>{ if(isDown && dragged){ suppressClick=true; setTimeout(()=>suppressClick=false,120);} isDown=false; el.classList.remove('dragging'); });
+    // Only drag while the pointer button is physically down. Release immediately on up/cancel/blur,
+    // and use a window-level fallback so releasing OUTSIDE the gallery never leaves a stuck drag.
+    let pointerId=null, startX=0, startLeft=0, moved=false;
+    const finish=(e)=>{
+      if(pointerId===null) return;
+      if(e && e.pointerId!==undefined && e.pointerId!==pointerId) return;
+      if(moved){suppressClick=true;setTimeout(()=>{suppressClick=false},180)}
+      const id=pointerId;
+      pointerId=null; moved=false;
+      el.classList.remove('dragging');
+      try{if(el.hasPointerCapture(id))el.releasePointerCapture(id)}catch(_){ }
+    };
+    el.addEventListener('pointerdown',e=>{
+      if(e.button!==0 || e.pointerType==='touch')return;
+      finish();
+      pointerId=e.pointerId; startX=e.clientX; startLeft=el.scrollLeft; moved=false;
+      el.classList.add('dragging');
+      // Capture pointer to get the release even outside the wall.
+      try{el.setPointerCapture(e.pointerId)}catch(_){ }
+    });
+    el.addEventListener('pointermove',e=>{
+      if(pointerId!==e.pointerId)return;
+      if((e.buttons&1)===0){finish(e);return}
+      const dx=e.clientX-startX;
+      if(Math.abs(dx)>5)moved=true;
+      if(moved)el.scrollLeft=startLeft-dx;
+    });
+    el.addEventListener('pointerup',finish);
+    el.addEventListener('pointercancel',finish);
+    el.addEventListener('lostpointercapture',finish);
+    window.addEventListener('pointerup',finish);
+    window.addEventListener('blur',()=>finish());
+    // Mouse wheel scrolls the exhibition horizontally; when at either end, allow page scroll.
+    el.addEventListener('wheel',e=>{
+      const max=el.scrollWidth-el.clientWidth;
+      if(max<=1)return;
+      const delta=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
+      const units=e.deltaMode===1?18:e.deltaMode===2?el.clientWidth:1;
+      const next=Math.max(0,Math.min(max,el.scrollLeft+delta*units));
+      if(Math.abs(next-el.scrollLeft)>0.2){e.preventDefault();el.scrollLeft=next}
+    },{passive:false});
   }
 
   function bindUI(){
