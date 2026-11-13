@@ -1,72 +1,565 @@
 <!doctype html>
 <html lang="ko">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#171715">
-<meta name="description" content="코너의 미술관 — 커뮤니티 작품 전시와 캐릭터 아카이브">
-<title>코너의 미술관 · CURATED ART ARCHIVE</title>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#151513;--panel:#1e1e1b;--panel2:#272722;--ink:#f1eee8;--sub:#c0b9ab;--mute:#958f82;--line:#444139;--accent:#d6c39b;--green:#a5b992;--serif:'Playfair Display',Georgia,serif;--sans:'DM Sans','Noto Sans KR',sans-serif}
-*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:400 14px/1.65 var(--sans);-webkit-font-smoothing:antialiased}button,input,select{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}button{color:inherit}img{display:block}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}[hidden]{display:none!important}
-.shell{max-width:1500px;padding:0 clamp(18px,5vw,80px);margin:auto}.top{min-height:78px;display:flex;align-items:center;justify-content:space-between;gap:20px;border-bottom:1px solid var(--line)}.brand{font-size:13px;letter-spacing:.13em;font-weight:700;display:flex;align-items:center;gap:12px}.mark{display:inline-grid;place-items:center;width:35px;height:35px;border:1px solid var(--accent);color:var(--accent);font:25px var(--serif)}.nav{display:flex;gap:22px;color:var(--sub);font-size:11px;letter-spacing:.08em}.nav a:hover{color:var(--accent)}.kicker{font-size:11px;letter-spacing:.2em;color:var(--accent);font-weight:600}.hero{display:grid;grid-template-columns:1.2fr .8fr;align-items:end;gap:40px;padding:75px 0 50px}.hero h1{font:400 clamp(52px,6.9vw,106px)/1.01 var(--serif);letter-spacing:-.05em;margin:16px 0}.hero h1 em{color:var(--accent)}.hero p{line-height:2;color:var(--sub);max-width:360px;margin:0 0 18px auto}.hero-stats{display:flex;justify-content:flex-end;gap:25px}.hero-stats strong{display:block;font:35px var(--serif)}.hero-stats small{color:var(--mute);font-size:10px;letter-spacing:.09em}.ribbon{border-block:1px solid var(--line);padding:18px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:10px;color:var(--mute);letter-spacing:.11em}
-section{scroll-margin-top:30px}.heading{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:75px 0 24px}.heading h2{font:400 clamp(32px,4vw,52px)/1.15 var(--serif);margin:7px 0 6px}.heading p{color:var(--sub);font-size:13px;margin:0}.pill{display:inline-flex;gap:8px;align-items:center;background:var(--panel);border:1px solid var(--line);padding:8px 12px;color:var(--sub);font-size:12px;border-radius:99px}
-.btn{border:1px solid var(--line);background:var(--panel);padding:11px 16px;border-radius:5px;font-size:13px;transition:.15s}.btn:hover,.btn.selected{border-color:var(--accent);color:var(--accent);background:#302d25}.btn.primary{background:var(--accent);color:#191815;border-color:var(--accent);font-weight:600}.btn.primary:hover{background:#e6d4af}.buttons{display:flex;gap:9px;flex-wrap:wrap}
-.rail-head{display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:17px}.rail{display:flex;gap:25px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:thin;scrollbar-color:#6d6658 transparent;padding:3px 2px 20px;cursor:grab;user-select:none}.rail.dragging{cursor:grabbing;scroll-snap-type:none}.rail .artcard{flex:0 0 clamp(255px,30vw,390px);scroll-snap-align:start}.frame{position:relative;display:grid;place-items:center;overflow:hidden;min-width:0;background:#23231f;padding:17px;border:1px solid #5e5545;box-shadow:inset 0 0 0 4px #3a3329,inset 0 0 0 7px #a49370,0 7px 20px #0006;aspect-ratio:4/3}.frame::after{content:'';position:absolute;inset:10px;pointer-events:none;border:1px solid #7f7256}.frame .mat{display:flex;align-items:center;justify-content:center;width:100%;height:100%;background:#e6e0d3;padding:12px;min-width:0;min-height:0}.frame img,.frame video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain;background:#ddd6c8}.frame video{background:#1b1b1b}.frame .play{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:58px;height:58px;display:grid;place-items:center;border-radius:50%;background:#121212c7;color:white;font-size:26px;pointer-events:none;border:1px solid #ffffff66}.frame .mediatag{position:absolute;top:24px;right:24px;background:#161616e0;color:#fff;padding:4px 9px;font-size:10px;letter-spacing:.07em;pointer-events:none}.caption{padding-top:14px}.caption b{font-size:15px;font-weight:600;display:block;white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.caption small{font-size:11px;color:var(--sub);display:block;margin-top:5px}.artcard{min-width:0;cursor:pointer}.artcard:hover .frame{border-color:var(--accent)}
-.halls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.hall{border:1px solid var(--line);background:#1e1d1a;min-height:185px;padding:24px;display:flex;flex-direction:column;justify-content:space-between;text-align:left}.hall:hover,.artist:hover{border-color:var(--accent);background:#27241f}.hall .num{font-size:10px;letter-spacing:.14em;color:var(--accent)}.hall b{font-size:19px;font-weight:500}.hall .last{display:flex;justify-content:space-between;align-items:center;color:var(--mute);font-size:12px}.artist-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.artist{background:var(--panel);border:1px solid var(--line);padding:20px;display:flex;align-items:center;gap:15px;text-align:left}.artist .symbol{width:52px;height:52px;display:grid;place-items:center;background:#302e29;font-size:27px}.artist b{font-size:17px}.artist small{display:block;font-size:11px;color:var(--mute);margin-top:4px}
-.controlbar{background:var(--panel);border:1px solid var(--line);padding:17px;display:grid;grid-template-columns:minmax(160px,1.2fr) repeat(3,minmax(130px,.75fr));gap:10px}.controlbar input,.controlbar select{background:#11110f;border:1px solid var(--line);color:var(--ink);width:100%;padding:12px;border-radius:3px}.active{padding:12px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--sub);font-size:12px}.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:30px 19px}.gallery .artcard .frame{aspect-ratio:4/3}.empty{grid-column:1/-1;border:1px dashed var(--line);padding:45px 24px;color:var(--sub);text-align:center}.more{width:100%;margin:26px 0;padding:16px;border:1px solid var(--line);background:var(--panel);font-weight:600}.more:hover{border-color:var(--accent)}.notice{border:1px solid var(--line);padding:19px 21px;background:#211f1b;color:var(--sub);margin:35px 0}.notice a{text-decoration:underline;text-underline-offset:3px}.notice summary{cursor:pointer;color:var(--ink);font-weight:600}.notice p{font-size:12px;line-height:1.9}.foot{border-top:1px solid var(--line);padding-top:22px;padding-bottom:45px;display:flex;justify-content:space-between;gap:14px;color:var(--mute);font-size:11px}
-.lightbox{position:fixed;inset:0;background:#0b0b0bf5;z-index:200;display:none;align-items:center;justify-content:center;padding:58px clamp(15px,3vw,40px) 25px}.lightbox.open{display:flex}.close{position:absolute;right:20px;top:12px;border:0;background:transparent;color:white;font-size:35px;line-height:1}.viewer{width:min(1520px,100%);height:min(87vh,900px);display:grid;grid-template-columns:minmax(0,1.75fr) minmax(280px,.65fr);gap:24px}.viewer-image{min-height:0;display:grid;place-items:center;background:#171714;border:9px solid #524532;outline:2px solid #8a795d;box-shadow:inset 0 0 0 4px #c6aa73}.viewer-image img,.viewer-image video{max-width:100%;max-height:100%;width:100%;height:100%;object-fit:contain}.viewer-image video{background:#070707}.viewer-info{overflow-y:auto;padding:20px 0 20px 12px}.viewer-info h2{font:400 clamp(27px,3vw,40px)/1.2 var(--serif);word-break:break-word}.viewer-info p{white-space:pre-wrap;color:var(--sub);font-size:13px}.viewer-info .meta{margin:13px 0;color:var(--sub);font-size:12px}.viewer-info .meta strong{color:var(--ink)}.viewer-info .label{font-size:10px;color:var(--accent);letter-spacing:.16em}.viewer-actions{display:flex;gap:9px;flex-wrap:wrap;margin-top:18px}.viewer-actions .btn{padding:10px 13px}.editbox{border:1px solid var(--line);background:#22211e;padding:18px;margin-top:22px}.editbox label{display:block;font-size:11px;color:var(--sub);margin-bottom:7px}.editbox input{width:100%;padding:10px 12px;margin-bottom:12px;background:#141412;border:1px solid var(--line);color:var(--ink)}.editbox p{font-size:11px;color:var(--mute);line-height:1.8}.audit{font-size:11px;color:var(--green);margin-top:10px}.tooltip{font-size:12px;color:var(--sub)}
-@media(max-width:1040px){.gallery{grid-template-columns:repeat(2,1fr)}.halls{grid-template-columns:repeat(2,1fr)}.controlbar{grid-template-columns:1fr 1fr}.hero{grid-template-columns:1fr}.hero p{margin-left:0}.hero-stats{justify-content:flex-start}}
-@media(max-width:700px){.top{flex-wrap:wrap;padding-top:15px;padding-bottom:15px}.nav{gap:12px;flex-wrap:wrap}.hero{padding:55px 0 32px}.hero h1{font-size:57px}.heading{margin:55px 0 22px}.gallery{grid-template-columns:1fr}.halls,.artist-row{grid-template-columns:1fr}.controlbar{grid-template-columns:1fr}.lightbox{padding:50px 14px 18px;overflow-y:auto}.viewer{grid-template-columns:1fr;height:auto;max-height:none}.viewer-image{height:48vh}.viewer-info{padding:10px 2px 40px}.artist{padding:15px}.rail .artcard{flex-basis:80vw}}
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-</style></head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="theme-color" content="#121212" />
+  <title>코너의 미술관</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+KR:wght@300;400;500;700&family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#121212;--bg2:#1a1a18;--panel:#20201d;--panel2:#272723;--line:#3f3d38;--ink:#f1ede6;--sub:#c8c1b3;--mute:#9d9689;
+      --gold:#d5c19a;--gold2:#9f8454;--mat:#ece4d6;--wall:#2b2824;--green:#8db08f;--red:#da9999;
+      --sans:'DM Sans','Noto Sans KR',sans-serif;--serif:'Playfair Display',Georgia,serif;
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth} body{margin:0;background:radial-gradient(circle at top,#1d1c19 0,#121212 30%);color:var(--ink);font:400 14px/1.7 var(--sans);-webkit-font-smoothing:antialiased}
+    img,video{display:block;max-width:100%} a{text-decoration:none;color:inherit} button,input,select{font:inherit} button{cursor:pointer;color:inherit}
+    button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+    [hidden]{display:none!important}
+
+    .shell{max-width:1520px;margin:0 auto;padding:0 clamp(16px,4vw,68px)}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:78px;border-bottom:1px solid var(--line)}
+    .brand{display:flex;align-items:center;gap:12px;font-weight:700;letter-spacing:.12em;font-size:13px}
+    .brand-mark{width:36px;height:36px;display:grid;place-items:center;border:1px solid var(--gold);color:var(--gold);font:700 26px var(--serif)}
+    .topnav{display:flex;gap:18px;flex-wrap:wrap;color:var(--sub);font-size:12px}
+    .topnav a:hover{color:var(--gold)}
+
+    .hero{display:grid;grid-template-columns:1.3fr .7fr;gap:28px;padding:56px 0 34px;align-items:end}
+    .eyebrow{color:var(--gold);letter-spacing:.18em;font-size:11px;font-weight:700}
+    h1{margin:12px 0 10px;font:600 clamp(42px,6vw,96px)/1.02 var(--serif);letter-spacing:-.05em}
+    .hero p{margin:0;color:var(--sub);max-width:720px;font-size:15px}
+    .hero-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+    .hero-stats .stat{padding:18px;border:1px solid var(--line);background:linear-gradient(180deg,#22211e,#1a1a18)}
+    .hero-stats strong{display:block;font:600 30px/1 var(--serif)}
+    .hero-stats span{display:block;color:var(--mute);font-size:11px;letter-spacing:.08em;margin-top:8px}
+    .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:14px 0;color:var(--mute);font-size:12px;letter-spacing:.08em}
+
+    section{padding:54px 0;scroll-margin-top:24px}
+    .section-head{display:flex;align-items:end;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:20px}
+    .section-head h2{margin:6px 0 0;font:600 clamp(30px,4vw,54px)/1.1 var(--serif)}
+    .section-head p{margin:0;color:var(--sub)}
+    .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--line);background:var(--panel);border-radius:999px;color:var(--sub);font-size:12px}
+    .buttons{display:flex;flex-wrap:wrap;gap:10px}
+    .btn{border:1px solid var(--line);background:var(--panel);padding:10px 14px;border-radius:7px;transition:.16s ease}
+    .btn:hover,.btn.active{border-color:var(--gold);color:var(--gold);background:#2b2822}
+    .btn.primary{background:var(--gold);color:#171511;border-color:var(--gold);font-weight:700}
+    .btn.primary:hover{filter:brightness(1.05)}
+
+    /* museum wall */
+    .museum-wall{position:relative;background:linear-gradient(180deg,#302d28 0,#25231f 65%,#1a1a18 65%,#1a1a18 100%);border:1px solid var(--line);border-radius:22px;padding:30px 0 22px;overflow:hidden}
+    .museum-wall::before{content:'';position:absolute;inset:0 0 auto 0;height:60%;background:linear-gradient(180deg,rgba(255,255,255,.03),rgba(255,255,255,0));pointer-events:none}
+    .museum-wall::after{content:'';position:absolute;left:0;right:0;bottom:46px;height:10px;background:linear-gradient(90deg,#524838,#7a6a52,#524838)}
+    .wall-guide{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:0 24px 14px;position:relative;z-index:1}
+    .wall-guide p{margin:0;color:#dfd5c3;font-size:13px}
+    .wall-track{display:flex;align-items:flex-end;gap:34px;overflow-x:auto;scrollbar-width:thin;scrollbar-color:#86714d transparent;padding:24px 28px 46px;cursor:grab;position:relative;z-index:1}
+    .wall-track.dragging{cursor:grabbing;scroll-snap-type:none}
+    .wall-piece{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:10px;min-width:220px}
+    .wall-caption{font-size:11px;color:#d4c7ae;text-align:center;max-width:260px}
+
+    /* adaptive frame */
+    .frame-wrap{display:inline-block;padding:13px;border:1px solid #6a5940;background:#2c251e;box-shadow:inset 0 0 0 4px #4f4434,inset 0 0 0 8px #b89e74,0 12px 24px rgba(0,0,0,.35)}
+    .frame-inner{background:var(--mat);padding:12px;display:flex;align-items:center;justify-content:center}
+    .frame-media{position:relative;display:flex;align-items:center;justify-content:center;background:#ded6c9;overflow:hidden}
+    .frame-media img,.frame-media video{display:block;height:auto;width:auto;max-width:min(62vw,460px);max-height:clamp(220px,34vw,420px);object-fit:contain;background:#ddd4c6}
+    .frame-media.video-thumb{background:#090909}
+    .frame-play{position:absolute;inset:auto auto 16px 16px;background:rgba(0,0,0,.68);color:#fff;border:1px solid rgba(255,255,255,.32);width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-size:18px;pointer-events:none}
+    .media-badge{position:absolute;right:12px;top:12px;background:rgba(0,0,0,.72);color:#fff;border-radius:999px;padding:4px 8px;font-size:10px;letter-spacing:.08em}
+
+    .hall-grid,.artist-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+    .hall-card,.artist-card{border:1px solid var(--line);background:linear-gradient(180deg,#22211e,#1b1b19);padding:18px;transition:.16s ease;text-align:left}
+    .hall-card:hover,.artist-card:hover{border-color:var(--gold);background:#28261f}
+    .hall-card small,.artist-card small{display:block;color:var(--mute);font-size:11px;letter-spacing:.08em}
+    .hall-card b,.artist-card b{display:block;font-size:20px;font-weight:600;margin:8px 0}
+    .artist-head{display:flex;align-items:center;gap:14px}.artist-symbol{font-size:28px;width:54px;height:54px;display:grid;place-items:center;background:#2e2c27}
+
+    .filters{display:grid;grid-template-columns:minmax(240px,1.3fr) repeat(4,minmax(140px,.8fr));gap:10px;padding:16px;border:1px solid var(--line);background:var(--panel);border-radius:14px}
+    .filters input,.filters select{width:100%;padding:12px 14px;border-radius:10px;background:#11110f;border:1px solid var(--line);color:var(--ink)}
+    .filters-row{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;margin-top:12px}
+    .status-line{color:var(--sub);font-size:13px}
+
+    .archive-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 24px;margin-top:24px}
+    .art-card{background:var(--panel);border:1px solid var(--line);padding:20px;border-radius:18px;cursor:pointer;transition:.16s ease}
+    .art-card:hover{transform:translateY(-2px);border-color:var(--gold)}
+    .art-card .frame-media img,.art-card .frame-media video{max-width:min(100%,680px);max-height:clamp(280px,34vw,520px)}
+    .art-meta{padding-top:16px}
+    .art-meta h3{margin:0;font-size:21px;line-height:1.35}
+    .art-meta .sub{margin-top:7px;color:var(--sub);font-size:12px}
+    .art-meta .desc{margin-top:8px;color:var(--mute);font-size:13px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+    .empty{padding:46px 24px;border:1px dashed var(--line);border-radius:14px;color:var(--sub);text-align:center;grid-column:1/-1}
+    .load-more{width:100%;margin-top:24px;padding:16px;border-radius:12px;border:1px solid var(--line);background:var(--panel);font-weight:700}
+    .load-more:hover{border-color:var(--gold)}
+
+    details.diagnostic{margin-top:20px;border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:14px 16px;color:var(--sub)}
+    details.diagnostic summary{cursor:pointer;color:var(--ink);font-weight:700}
+
+    footer{padding:26px 0 48px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:var(--mute);font-size:12px}
+
+    /* lightbox */
+    .lightbox{position:fixed;inset:0;background:rgba(7,7,7,.95);backdrop-filter:blur(3px);z-index:300;display:none;padding:20px}
+    .lightbox.open{display:block}
+    .light-shell{height:100%;display:grid;grid-template-columns:minmax(0,1.3fr) minmax(320px,.7fr);gap:20px}
+    .stage-panel{display:flex;flex-direction:column;min-height:0}
+    .light-top{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:10px}
+    .light-actions{display:flex;gap:8px;flex-wrap:wrap}
+    .ghost-btn{border:1px solid var(--line);background:rgba(255,255,255,.04);padding:10px 12px;border-radius:10px}
+    .ghost-btn:hover,.ghost-btn.active{border-color:var(--gold);color:var(--gold)}
+    .stage-frame{flex:1;min-height:0;border:1px solid #5f523d;background:#0f0f0d;box-shadow:inset 0 0 0 6px #3b3227,inset 0 0 0 10px #c0a679;padding:14px}
+    .stage-mat{height:100%;background:#e8dfd2;padding:18px;overflow:auto}
+    .stage-media{min-height:100%;display:flex;justify-content:center;align-items:flex-start;position:relative}
+    .stage-media.fit img{max-width:100%;height:auto;width:auto}
+    .stage-media.fit video{max-width:100%;max-height:100%;width:auto;height:auto}
+    .stage-media.scroll img{max-width:none;width:auto;height:auto}
+    .stage-media.scroll video{max-width:100%;height:auto}
+    .stage-media img,.stage-media video{background:#dad2c5}
+    .info-panel{border:1px solid var(--line);background:var(--panel);border-radius:18px;padding:18px 18px 22px;overflow:auto}
+    .info-panel h3{margin:4px 0 8px;font:600 clamp(28px,3vw,42px)/1.18 var(--serif)}
+    .info-panel .meta{color:var(--sub);font-size:13px;white-space:pre-line}
+    .info-panel .desc{color:var(--sub);margin-top:12px;white-space:pre-wrap}
+    .chipline{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 14px}
+    .chip{display:inline-flex;padding:6px 10px;border-radius:999px;background:#11110f;border:1px solid var(--line);color:var(--sub);font-size:12px}
+    .notice-box{margin-top:14px;padding:14px;border-radius:14px;background:#171715;border:1px solid var(--line);color:var(--sub);font-size:12px}
+    .notice-box.local{border-color:#46614c}
+    .formbox{margin-top:18px;padding:16px;border:1px solid var(--line);border-radius:14px;background:#171715}
+    .formbox h4{margin:0 0 10px;font-size:15px}
+    .formbox label{display:block;font-size:12px;color:var(--sub);margin:12px 0 6px}
+    .formbox input{width:100%;padding:12px;border-radius:10px;border:1px solid var(--line);background:#10100f;color:var(--ink)}
+    .helper{margin-top:8px;font-size:12px;color:var(--mute)}
+    .message.ok{color:var(--green)} .message.err{color:var(--red)}
+
+    @media (max-width:1200px){
+      .hero{grid-template-columns:1fr}.archive-grid,.hall-grid,.artist-grid{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr 1fr 1fr}.filters > :first-child{grid-column:1/-1}.light-shell{grid-template-columns:1fr;overflow:auto}.stage-panel{min-height:55vh}
+    }
+    @media (max-width:760px){
+      .topbar{padding:12px 0;flex-wrap:wrap}.hero{padding-top:36px}.hero-stats{grid-template-columns:1fr}.archive-grid,.hall-grid,.artist-grid,.filters{grid-template-columns:1fr}.wall-piece{min-width:180px}.frame-media img,.frame-media video{max-height:300px}.art-card .frame-media img,.art-card .frame-media video{max-height:380px}.lightbox{padding:12px}.stage-mat{padding:10px}
+    }
+    @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
 <body>
-<header class="shell top"><a class="brand" href="#top"><span class="mark">C</span><span>CORNER / ART MUSEUM</span></a><nav class="nav"><a href="#exhibition">대표 전시</a><a href="#halls">전시관</a><a href="#characters">캐릭터</a><a href="#archive">전체 작품</a></nav></header>
-<main id="top" class="shell">
-<div class="hero"><div><div class="kicker">A COMMUNITY ART ARCHIVE · 2026</div><h1>Every art<br>has a <em>story.</em></h1></div><div><p>그림이 잘리지 않는 액자 속에 작품을 담았습니다. 옆으로 넘기며 감상하고, 캐릭터와 전시관별로 원하는 작품을 찾아보세요.</p><div class="hero-stats"><div><strong id="stat-count">—</strong><small>COLLECTED WORKS</small></div><div><strong>07</strong><small>EXHIBITION HALLS</small></div><div><strong>03</strong><small>CHARACTERS</small></div></div></div></div>
-<div class="ribbon"><span>ARCHIVE OF ART & MOTION</span><span>DRAG TO EXPLORE / 드래그해서 이동</span><span>ARTISTS ≠ CHARACTERS</span></div>
-<section id="exhibition"><div class="heading"><div><div class="kicker">01 / HIGHLIGHTS</div><h2>On the wall.</h2><p>마우스로 좌우로 드래그하거나 화살표를 눌러 작품을 감상해 주세요.</p></div><div class="buttons"><button class="btn" id="rail-prev" aria-label="이전 작품">←</button><button class="btn" id="rail-next" aria-label="다음 작품">→</button></div></div><div class="rail" id="rail"><div class="empty">작품을 불러오는 중입니다.</div></div></section>
-<section id="halls"><div class="heading"><div><div class="kicker">02 / SEVEN EXHIBITION HALLS</div><h2>Explore the rooms.</h2><p>채널마다 고유한 전시실을 만들었습니다.</p></div></div><div class="halls" id="hall-list"></div></section>
-<section id="characters"><div class="heading"><div><div class="kicker">03 / CHARACTER COLLECTIONS</div><h2>Meet the characters.</h2><p>그림을 올린 사람과 그림 속 캐릭터를 따로 구분합니다. 여러 캐릭터가 함께 나온 작품은 여러 전시실에 표시됩니다.</p></div></div><div class="artist-row" id="character-list"></div></section>
-<section id="archive"><div class="heading"><div><div class="kicker">04 / COMPLETE COLLECTION</div><h2 id="collection-name">The collection.</h2><p>작품의 원래 비율을 보존해 감상합니다.</p></div><button id="clear" class="btn" hidden>전체 작품 보기 ↶</button></div><div class="controlbar"><input type="search" id="search" placeholder="제목, 업로더, 작품 설명 검색" aria-label="검색"><select id="hall-filter" aria-label="전시관"><option value="all">모든 전시관</option></select><select id="character-filter" aria-label="캐릭터"><option value="all">모든 캐릭터</option><option value="corner">🖤 심심한 코너</option><option value="sosowaffle">🧡 소소와플</option><option value="gangsi">💙 강시</option><option value="unknown">캐릭터 미분류</option></select><select id="type-filter" aria-label="매체"><option value="all">이미지 + 동영상</option><option value="image">이미지만</option><option value="video">동영상만</option></select></div><div class="active"><span id="filter-status">전체 작품</span><span id="count-status">—</span></div><div class="gallery" id="gallery"><div class="empty">작품을 불러오는 중입니다.</div></div><button class="more" id="load-more" hidden>작품 더 보기 ↓</button></section>
-<details class="notice" id="diagnostic"><summary>작품 연결 상태 확인</summary><p id="diag-text">데이터 확인 중…</p><p>AI 캐릭터 분류는 기준 이미지 3장과 API 키를 등록하면 점진적으로 진행됩니다. 아직 분류되지 않은 작품은 '캐릭터 미분류'로 표시합니다.</p></details>
-</main><footer class="shell foot"><span>© <span id="year"></span> CORNER ART MUSEUM</span><span>ILLUSTRATION · COMICS · MOVING IMAGES</span></footer>
-<div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="작품 감상" aria-hidden="true"><button class="close" id="close" aria-label="닫기">×</button><div class="viewer"><div class="viewer-image"><img id="big-image" alt="" hidden><video id="big-video" controls playsinline hidden></video></div><div class="viewer-info"><div class="label" id="detail-hall"></div><h2 id="detail-title"></h2><div class="meta" id="detail-meta"></div><p id="detail-desc"></p><div class="audit" id="detail-audit"></div><div class="viewer-actions"><button class="btn" id="prev">← 이전 작품</button><button class="btn" id="next">다음 작품 →</button><a class="btn" id="discord-link" target="_blank" rel="noopener noreferrer" hidden>디스코드 원문 ↗</a></div><div class="editbox"><div class="kicker" style="margin-bottom:12px">CHANGE TITLE / 제목 변경 신청</div><label for="new-title">변경할 작품 제목</label><input id="new-title" required maxlength="100" placeholder="새 제목을 입력해 주세요"><label for="editor-nickname">수정자 닉네임 (필수)</label><input id="editor-nickname" required maxlength="40" placeholder="표시할 닉네임"><button class="btn primary" id="propose">제목 변경 신청 ↗</button><p>GitHub 로그인 후 신청이 등록되며, 자동 처리 작업이 새 제목과 수정자 닉네임을 기록합니다. 악의적인 변경은 관리자가 기록을 확인하고 되돌릴 수 있습니다.</p><div class="tooltip" id="edit-message"></div></div></div></div></div>
+  <header class="shell topbar">
+    <a href="#top" class="brand"><span class="brand-mark">◫</span><span>코너의 미술관</span></a>
+    <nav class="topnav">
+      <a href="#wall">뮤지엄 월</a>
+      <a href="#halls">전시관</a>
+      <a href="#artists">캐릭터</a>
+      <a href="#archive">전체 작품</a>
+    </nav>
+  </header>
+
+  <main id="top" class="shell">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">COMMUNITY DIGITAL MUSEUM</div>
+        <h1>Behind the <span style="color:var(--gold)">canvas</span>.</h1>
+        <p>디스코드에 업로드된 작품을 자동으로 모아 전시하는 온라인 미술관입니다. 이번 버전은 작품이 더 크게 보이도록 레이아웃을 넓혔고, 실제 미술관 벽을 지나가듯 마우스로 휙휙 넘겨 볼 수 있는 <b>뮤지엄 월</b>을 추가했습니다.</p>
+      </div>
+      <div class="hero-stats">
+        <div class="stat"><strong id="stat-count">0</strong><span>REGISTERED ARTWORKS</span></div>
+        <div class="stat"><strong id="stat-video">0</strong><span>VIDEOS</span></div>
+        <div class="stat"><strong id="stat-edit">0</strong><span>TITLE OVERRIDES</span></div>
+      </div>
+    </section>
+
+    <div class="toolbar">
+      <span>업로드 작가와 캐릭터 분류는 별개로 표시됩니다.</span>
+      <span id="diag-mini">데이터 로딩 중...</span>
+    </div>
+
+    <section id="wall">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">01 / MUSEUM WALL</div>
+          <h2>마우스로 훑어보는 전시 벽</h2>
+          <p>실제 미술관 외벽을 따라 액자가 걸려 있는 느낌으로, 드래그해서 빠르게 작품을 넘길 수 있어요.</p>
+        </div>
+        <div class="buttons">
+          <button class="btn" id="wall-prev">← 이전</button>
+          <button class="btn" id="wall-next">다음 →</button>
+        </div>
+      </div>
+      <div class="museum-wall">
+        <div class="wall-guide">
+          <p>액자 크기가 작품 비율을 따라가도록 바꾸었습니다. 잘림 없이 작품이 더 크게 보여요.</p>
+          <span class="pill" id="wall-count">0 works</span>
+        </div>
+        <div id="wall-track" class="wall-track" aria-label="가로 전시 벽"></div>
+      </div>
+    </section>
+
+    <section id="halls">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">02 / EXHIBITION HALLS</div>
+          <h2>전시관 둘러보기</h2>
+        </div>
+      </div>
+      <div id="hall-grid" class="hall-grid"></div>
+    </section>
+
+    <section id="artists">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">03 / CHARACTER VIEW</div>
+          <h2>캐릭터별로 보기</h2>
+          <p>업로드한 사람과 별개로, 작품이 어떤 캐릭터인지 기준으로 모아볼 수 있습니다.</p>
+        </div>
+      </div>
+      <div id="artist-grid" class="artist-grid"></div>
+    </section>
+
+    <section id="archive">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">04 / ARCHIVE</div>
+          <h2 id="collection-name">전체 작품</h2>
+          <p>작품을 크게 보고 싶을 때를 위해 카드 크기를 넓혔습니다. 클릭하면 스크롤 가능한 상세 보기로 들어갑니다.</p>
+        </div>
+        <span class="pill" id="count-status">0개 작품</span>
+      </div>
+
+      <div class="filters">
+        <input id="search" type="search" placeholder="작품명, 설명, 업로더로 검색" />
+        <select id="hall-filter"></select>
+        <select id="character-filter"></select>
+        <select id="type-filter">
+          <option value="all">모든 형식</option>
+          <option value="image">이미지</option>
+          <option value="video">비디오</option>
+        </select>
+        <select id="sort-filter">
+          <option value="latest">최신순</option>
+          <option value="oldest">오래된순</option>
+          <option value="title">제목순</option>
+          <option value="random">무작위</option>
+        </select>
+      </div>
+      <div class="filters-row">
+        <div class="status-line"><span id="filter-status">전체 전시관 · 모든 캐릭터</span></div>
+        <div class="buttons">
+          <button class="btn" id="clear">필터 초기화</button>
+        </div>
+      </div>
+
+      <div id="archive-grid" class="archive-grid"></div>
+      <button id="load-more" class="load-more" hidden>더 보기</button>
+
+      <details id="diagnostic" class="diagnostic">
+        <summary>작품 연결 상태 확인</summary>
+        <p id="diag-text">대기 중...</p>
+      </details>
+    </section>
+  </main>
+
+  <footer class="shell">
+    <span>© <span id="year"></span> Corner Art Museum</span>
+    <span>디스코드 업로드 → GitHub Actions → 전시 페이지 자동 반영</span>
+  </footer>
+
+  <div id="lightbox" class="lightbox" aria-hidden="true">
+    <div class="light-shell">
+      <section class="stage-panel">
+        <div class="light-top">
+          <div class="pill" id="light-position">1 / 1</div>
+          <div class="light-actions">
+            <button id="prev-art" class="ghost-btn">←</button>
+            <button id="next-art" class="ghost-btn">→</button>
+            <button id="fit-view" class="ghost-btn active">맞춤 보기</button>
+            <button id="scroll-view" class="ghost-btn">원본 / 스크롤</button>
+            <button id="close-lightbox" class="ghost-btn">닫기 ✕</button>
+          </div>
+        </div>
+        <div class="stage-frame">
+          <div class="stage-mat">
+            <div id="stage-media" class="stage-media fit">
+              <img id="stage-image" hidden alt="" />
+              <video id="stage-video" hidden controls playsinline preload="metadata"></video>
+            </div>
+          </div>
+        </div>
+      </section>
+      <aside class="info-panel">
+        <div class="eyebrow">ARTWORK DETAIL</div>
+        <h3 id="detail-title">제목</h3>
+        <div class="chipline">
+          <span class="chip" id="detail-hall"></span>
+          <span class="chip" id="detail-author"></span>
+          <span class="chip" id="detail-type"></span>
+        </div>
+        <div class="meta" id="detail-meta"></div>
+        <div class="desc" id="detail-desc"></div>
+        <div class="notice-box" id="edit-audit">등록된 제목 수정 내역이 없습니다.</div>
+        <div class="notice-box local">사이트에서 바로 변경을 적용하면 <b>현재 브라우저에서만</b> 즉시 반영됩니다. 모든 방문자에게 반영하려면 GitHub 신청이 필요합니다.</div>
+
+        <div class="formbox">
+          <h4>제목 수정</h4>
+          <label for="title-input">새 제목</label>
+          <input id="title-input" type="text" maxlength="100" placeholder="작품 제목" />
+          <label for="nickname-input">수정자 닉네임 <span style="color:var(--gold)">*</span></label>
+          <input id="nickname-input" type="text" maxlength="40" placeholder="닉네임 필수" />
+          <div class="buttons" style="margin-top:12px">
+            <button id="save-local" class="btn primary">사이트에서 바로 적용</button>
+            <button id="submit-github" class="btn">전체 반영 신청</button>
+          </div>
+          <div class="helper">"사이트에서 바로 적용"은 GitHub 없이 여기서 끝낼 수 있어요. 다만 현재 기기/브라우저에서만 유지됩니다.</div>
+          <p id="edit-message" class="message"></p>
+        </div>
+      </aside>
+    </div>
+  </div>
+
 <script>
-(()=>{'use strict';
-const $=s=>document.getElementById(s);const REPO='sosowaffle/Corner_Art_Museum';const RAW='https://raw.githubusercontent.com/'+REPO+'/main/';
-const HALLS=[['corner-art','코너의 미술관'],['corner-war','코너의 전쟁기념관'],['corner-hehe','코너의 으흐흐관'],['to-sosowaffle','to-소소와플'],['to-corner','to-심심한코너'],['to-gangsi','to-강시'],['corner-comics','코너의 만화']];
-const CHARS=[{id:'corner',name:'심심한 코너',symbol:'🖤'},{id:'sosowaffle',name:'소소와플',symbol:'🧡'},{id:'gangsi',name:'강시',symbol:'💙'}];
-const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const mediaPath=p=>typeof p==='string'&&/^assets\/artworks\/[a-zA-Z0-9_.-]+\.(?:png|jpg|jpeg|gif|webp|mp4|webm)$/i.test(p)?p:'';
-const posterPath=p=>typeof p==='string'&&/^assets\/posters\/[a-zA-Z0-9_.-]+\.jpg$/i.test(p)?p:'';
-const url=p=>p?RAW+p:'';const isVideo=a=>a.mediaType==='video'||/\.(mp4|webm)$/i.test(mediaPath(a.media||a.image));
-const charsOf=a=>{const row=tags[String(a.id)]||{};return Array.isArray(row.characters)?row.characters.filter(x=>CHARS.some(y=>y.id===x)):[]};
-const prettyChar=id=>CHARS.find(x=>x.id===id)?.name||'미분류';const nameHall=id=>HALLS.find(x=>x[0]===id)?.[1]||'기타 전시';
-const displayTitle=a=>{let v=overrides[String(a.id)]?.title||a.title||'';return String(v).trim()||'제목 없는 작품'};
-const author=a=>String(a.uploaderName||a.authorName||'익명 업로더');const formatDate=s=>{const d=new Date(s);return Number.isFinite(d.getTime())?d.toLocaleDateString('ko-KR'):''};
-let artworks=[],tags={},overrides={},current=[],show=18,activeIndex=-1,drag=false,dragStart=0,railStart=0;
-async function getJson(names,required=false){let errors=[];for(const link of names){try{let r=await fetch(link,{cache:'no-store'});if(!r.ok)throw Error('HTTP '+r.status);let v=await r.json();return v}catch(e){errors.push(e.message)}}if(required)throw Error(errors.join(' / ')||'데이터를 찾을 수 없음');return null}
-function media(a,preload='none'){const path=mediaPath(a.media||a.image);if(!path)return '';if(isVideo(a)){const post=posterPath(a.poster||a.thumbnail);return `${post?`<img loading="lazy" decoding="async" src="${esc(url(post))}" alt="${esc(displayTitle(a))} 영상 미리보기">`:`<video preload="${preload}" muted playsinline src="${esc(url(path))}#t=0.5" aria-label="${esc(displayTitle(a))} 미리보기"></video>`}<span class="play">▶</span><span class="mediatag">VIDEO</span>`}return `<img loading="lazy" decoding="async" src="${esc(url(path))}" alt="${esc(displayTitle(a))}">`}
-function card(a){return `<article class="artcard" tabindex="0" role="button" data-id="${esc(a.id)}" aria-label="${esc(displayTitle(a))} 보기"><div class="frame"><div class="mat">${media(a,'metadata')}</div></div><div class="caption"><b>${esc(displayTitle(a))}</b><small>${esc(author(a))} · ${esc(nameHall(a.category))}</small></div></article>`}
-function initCounts(){$('stat-count').textContent=artworks.length.toLocaleString('ko-KR');$('hall-list').innerHTML=HALLS.map(([id,label],i)=>`<button class="hall" data-hall="${id}"><span class="num">HALL ${String(i+1).padStart(2,'0')} / 07</span><b>${esc(label)}</b><span class="last"><span>${artworks.filter(a=>a.category===id).length} ARTWORKS</span>입장하기 ↗</span></button>`).join('');$('hall-filter').innerHTML='<option value="all">모든 전시관</option>'+HALLS.map(([id,label])=>`<option value="${id}">${esc(label)}</option>`).join('');$('character-list').innerHTML=CHARS.map(c=>`<button class="artist" data-char="${c.id}"><span class="symbol">${c.symbol}</span><span><b>${esc(c.name)}</b><small>${artworks.filter(a=>charsOf(a).includes(c.id)).length}개 작품 · 캐릭터 전시 보기</small></span></button>`).join('')}
-function buildRail(){let list=artworks.slice(0,24);$('rail').innerHTML=list.map(card).join('')||'<div class="empty">등록된 작품이 없습니다.</div>'}
-function filtered(){const q=$('search').value.trim().toLowerCase(),h=$('hall-filter').value,c=$('character-filter').value,t=$('type-filter').value;return artworks.filter(a=>(h==='all'||a.category===h)&&(c==='all'||(c==='unknown'?charsOf(a).length===0:charsOf(a).includes(c)))&&(t==='all'||(t==='video'?isVideo(a):!isVideo(a)))&&(!q||[displayTitle(a),a.description,author(a),a.channelName].some(x=>String(x||'').toLowerCase().includes(q))))}
-function render(reset=true){if(reset)show=18;current=filtered();$('count-status').textContent=current.length+'개 작품';let h=$('hall-filter').value,c=$('character-filter').value;$('collection-name').textContent=c!=='all'?(c==='unknown'?'Unclassified works.':prettyChar(c)+'.'):h!=='all'?nameHall(h)+'.':'The collection.';$('clear').hidden=h==='all'&&c==='all'&&$('type-filter').value==='all'&&!$('search').value;$('gallery').innerHTML=current.length?current.slice(0,show).map(card).join(''):'<div class="empty">이 조건에 맞는 작품이 아직 없어요.<br>분류되지 않은 작품은 ‘캐릭터 미분류’에서 찾을 수 있습니다.</div>';$('load-more').hidden=show>=current.length;$('load-more').textContent=`작품 더 보기 (${Math.min(show,current.length)} / ${current.length}) ↓`;$('filter-status').textContent=(h==='all'?'전체 전시관':nameHall(h))+' · '+(c==='all'?'모든 캐릭터':prettyChar(c));}
-function scrollArchive(){$('archive').scrollIntoView({behavior:'smooth',block:'start'})}
-function openArt(id,fromRail=false){const list=fromRail?artworks.slice(0,24):current;const idx=list.findIndex(a=>String(a.id)===id);if(idx<0)return;viewerList=list;activeIndex=idx;showArt();$('lightbox').classList.add('open');$('lightbox').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';$('close').focus()}
-let viewerList=[];
-function showArt(){let a=viewerList[activeIndex];if(!a)return;const im=$('big-image'),v=$('big-video');v.pause();v.removeAttribute('src');v.load();im.removeAttribute('src');let src=url(mediaPath(a.media||a.image));if(isVideo(a)){im.hidden=true;v.hidden=false;v.src=src;const p=posterPath(a.poster||a.thumbnail);if(p)v.poster=url(p);else v.removeAttribute('poster');v.load()}else{v.hidden=true;im.hidden=false;im.src=src;im.alt=displayTitle(a)}$('detail-title').textContent=displayTitle(a);$('detail-hall').textContent=nameHall(a.category)+' · '+(activeIndex+1)+' / '+viewerList.length;$('detail-meta').textContent='게시자: '+author(a)+' · '+formatDate(a.createdAt)+' · 캐릭터: '+(charsOf(a).map(prettyChar).join(', ')||'미분류');$('detail-desc').textContent=a.description||'';const edit=overrides[String(a.id)];$('detail-audit').textContent=edit?.nickname?'최근 제목 수정: '+edit.nickname+(edit.githubUser?' (@'+edit.githubUser+')':''):'';$('new-title').value=displayTitle(a);$('editor-nickname').value='';$('edit-message').textContent='';const link=String(a.messageUrl||'');$('discord-link').hidden=!/^https:\/\/discord\.com\/channels\/\d+\/\d+\/\d+$/.test(link);if(!$('discord-link').hidden)$('discord-link').href=link}
-function closeArt(){$('lightbox').classList.remove('open');$('lightbox').setAttribute('aria-hidden','true');document.body.style.overflow='';$('big-video').pause();$('big-video').removeAttribute('src');$('big-video').load()}
-function move(n){if(!viewerList.length)return;activeIndex=(activeIndex+n+viewerList.length)%viewerList.length;showArt()}
-function editTitle(){if(activeIndex<0)return;let a=viewerList[activeIndex],t=$('new-title').value.trim(),n=$('editor-nickname').value.trim();if(!t||!n){$('edit-message').textContent='제목과 수정자 닉네임을 모두 입력해 주세요.';return}if(t.length>100||n.length>40){$('edit-message').textContent='제목 100자, 닉네임 40자 이내로 입력해 주세요.';return}let body=`작품 ID: ${a.id}\n새 제목: ${t.replace(/[\r\n]/g,' ')}\n수정자 닉네임: ${n.replace(/[\r\n]/g,' ')}`;const link=`https://github.com/${REPO}/issues/new?title=${encodeURIComponent('[작품 제목 변경] '+a.id)}&body=${encodeURIComponent(body)}`;window.open(link,'_blank','noopener,noreferrer');$('edit-message').textContent='GitHub에서 Submit new issue를 눌러 신청을 완료해 주세요. GitHub 로그인이 필요합니다.'}
-function clicks(id,fn){$(id).addEventListener('click',fn)}
-['gallery','rail'].forEach(id=>{$(id).addEventListener('click',e=>{if(drag)return;let p=e.target.closest('[data-id]');if(p)openArt(p.dataset.id,id==='rail')});$(id).addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){let p=e.target.closest('[data-id]');if(p){e.preventDefault();openArt(p.dataset.id,id==='rail')}}})});
-$('hall-list').addEventListener('click',e=>{const b=e.target.closest('[data-hall]');if(!b)return;$('hall-filter').value=b.dataset.hall;$('character-filter').value='all';render();scrollArchive()});$('character-list').addEventListener('click',e=>{let b=e.target.closest('[data-char]');if(!b)return;$('hall-filter').value='all';$('character-filter').value=b.dataset.char;render();scrollArchive()});
-['search','hall-filter','character-filter','type-filter'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>render()));clicks('clear',()=>{$('search').value='';$('hall-filter').value='all';$('character-filter').value='all';$('type-filter').value='all';render()});clicks('load-more',()=>{show+=18;render(false)});clicks('rail-prev',()=>$('rail').scrollBy({left:-420,behavior:'smooth'}));clicks('rail-next',()=>$('rail').scrollBy({left:420,behavior:'smooth'}));clicks('close',closeArt);clicks('prev',()=>move(-1));clicks('next',()=>move(1));clicks('propose',editTitle);$('lightbox').addEventListener('click',e=>{if(e.target===$('lightbox'))closeArt()});document.addEventListener('keydown',e=>{if(!$('lightbox').classList.contains('open'))return;if(e.key==='Escape')closeArt();if(e.key==='ArrowLeft'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName))move(-1);if(e.key==='ArrowRight'&&!['INPUT','TEXTAREA'].includes(document.activeElement.tagName))move(1)});
-// Drag-to-scroll rail. Suppress the click on completion of a real drag.
-const rail=$('rail');let suppressClick=false;rail.addEventListener('pointerdown',e=>{if(e.button!==0)return;dragStart=e.clientX;railStart=rail.scrollLeft;drag=false});rail.addEventListener('pointermove',e=>{if(e.buttons!==1||!dragStart)return;if(Math.abs(e.clientX-dragStart)>7){drag=true;rail.classList.add('dragging');rail.scrollLeft=railStart-(e.clientX-dragStart)}});rail.addEventListener('pointerup',()=>{if(drag){suppressClick=true;setTimeout(()=>suppressClick=false,100)}dragStart=0;rail.classList.remove('dragging');setTimeout(()=>drag=false,0)});rail.addEventListener('click',e=>{if(suppressClick){e.stopPropagation();e.preventDefault()}},true);
-async function boot(){const ts=Date.now();try{const data=await getJson(['./gallery.json?v='+ts,RAW+'gallery.json?v='+ts],true);if(!Array.isArray(data.artworks))throw Error('gallery.json의 artworks 배열이 없습니다');const [tagObj,overrideObj]=await Promise.all([getJson(['./character-tags.json?v='+ts,RAW+'character-tags.json?v='+ts]),getJson(['./title-overrides.json?v='+ts,RAW+'title-overrides.json?v='+ts])]);tags=tagObj&&typeof tagObj==='object'?tagObj:{};overrides=overrideObj&&typeof overrideObj==='object'?overrideObj:{};artworks=data.artworks.filter(a=>a&&mediaPath(a.media||a.image)).sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));initCounts();buildRail();render();$('diag-text').textContent=`작품 ${artworks.length}개 로드됨 · 캐릭터 태그 ${Object.keys(tags).length}개 · 제목 수정 ${Object.keys(overrides).length}건`;if(!artworks.length)$('diagnostic').open=true}catch(e){$('diag-text').textContent='데이터 불러오기 실패: '+e.message;$('diagnostic').open=true;$('gallery').innerHTML='<div class="empty">작품을 불러올 수 없어요. 아래 작품 연결 상태를 확인해 주세요.</div>';$('rail').innerHTML='<div class="empty">작품 목록을 읽을 수 없습니다.</div>';console.error(e)}}
-$('year').textContent=new Date().getFullYear();boot();
+(() => {
+  'use strict';
+  const REPO='sosowaffle/Corner_Art_Museum';
+  const RAW=`https://raw.githubusercontent.com/${REPO}/main/`;
+  const LS_KEY='cornerMuseumLocalTitleEdits';
+  const HALLS=[
+    ['corner-art','코너의 미술관'],
+    ['corner-war','코너의 전장기념관'],
+    ['corner-uhuh','코너의 으흥관'],
+    ['to-sosowaffle','to-소소와플'],
+    ['to-simsim','to-심심한코너'],
+    ['to-gangsi','to-강시'],
+    ['corner-comics','코너의 만화']
+  ];
+  const CHARS=[
+    {id:'corner',name:'심심한 코너',symbol:'🖤'},
+    {id:'sosowaffle',name:'소소와플',symbol:'🧡'},
+    {id:'gangsi',name:'강시',symbol:'💙'}
+  ];
+  const $=id=>document.getElementById(id);
+  const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[m]));
+  const url=p=>/^https?:/.test(String(p||''))?String(p):String(p||'').replace(/^\.?\//,'');
+  const mediaPath=v=>typeof v==='string'&&v.trim()?v.trim():'';
+  const isVideo=a=>{const p=String(a.mediaType||a.type||a.mimeType||a.media||a.image||'').toLowerCase();return p.includes('video')||/\.(mp4|webm|mov|m4v)$/i.test(p)};
+  const posterPath=v=>typeof v==='string'&&v.trim()?v.trim():'';
+  const fmtDate=v=>{const d=new Date(v);return Number.isFinite(d.getTime())?d.toLocaleString('ko-KR'):'날짜 없음'};
+  const nameHall=id=>(HALLS.find(v=>v[0]===id)||[])[1]||id||'전시관 미지정';
+  const prettyChar=id=>(CHARS.find(v=>v.id===id)?.name)||'미분류';
+  const author=a=>a.uploaderName||a.authorName||a.author||a.username||'작성자 미상';
+  let artworks=[], tags={}, overrides={}, localEdits={}, current=[], viewerList=[], viewerIndex=0, visibleCount=12, suppressClick=false;
+
+  function loadLocalEdits(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}')}catch(_){return {}}}
+  function saveLocalEdits(){localStorage.setItem(LS_KEY, JSON.stringify(localEdits))}
+  function mergedEdit(id){return localEdits[id] || overrides[id] || null}
+  function displayTitle(a){const edit=mergedEdit(String(a.id)); return edit?.title || a.title || a.filename || a.originalFilename || 'Untitled';}
+  function charsOf(a){const t=tags[String(a.id)]; return Array.isArray(t)?t.filter(Boolean):[]}
+  function mediaHTML(a,forWall=false){
+    const src=mediaPath(a.media||a.image); if(!src) return '<div>미디어 없음</div>';
+    if(isVideo(a)){
+      const poster=posterPath(a.poster||a.thumbnail);
+      if(poster){
+        return `<div class="frame-media video-thumb"><img loading="lazy" decoding="async" src="${esc(url(poster))}" alt="${esc(displayTitle(a))} 영상 썸네일"><span class="frame-play">▶</span><span class="media-badge">VIDEO</span></div>`;
+      }
+      return `<div class="frame-media video-thumb"><video preload="metadata" muted playsinline src="${esc(url(src))}#t=0.1" aria-label="${esc(displayTitle(a))} 영상 미리보기"></video><span class="frame-play">▶</span><span class="media-badge">VIDEO</span></div>`;
+    }
+    return `<div class="frame-media"><img loading="lazy" decoding="async" src="${esc(url(src))}" alt="${esc(displayTitle(a))}"></div>`;
+  }
+  function frameHTML(a){return `<div class="frame-wrap"><div class="frame-inner">${mediaHTML(a)}</div></div>`}
+  function wallCard(a){return `<article class="wall-piece" tabindex="0" role="button" data-id="${esc(a.id)}" aria-label="${esc(displayTitle(a))} 보기">${frameHTML(a)}<div class="wall-caption"><strong>${esc(displayTitle(a))}</strong><br><span>${esc(author(a))}</span></div></article>`}
+  function archiveCard(a){
+    const cs=charsOf(a); const charText=cs.length?cs.map(prettyChar).join(', '):'캐릭터 미분류';
+    return `<article class="art-card" tabindex="0" role="button" data-id="${esc(a.id)}" aria-label="${esc(displayTitle(a))} 보기">${frameHTML(a)}<div class="art-meta"><h3>${esc(displayTitle(a))}</h3><div class="sub">${esc(author(a))} · ${esc(nameHall(a.category))} · ${isVideo(a)?'비디오':'이미지'}</div><div class="desc">${esc(a.description || charText)}</div></div></article>`;
+  }
+
+  async function getJson(paths,required=false){
+    let errors=[];
+    for(const p of paths){
+      try{
+        const r=await fetch(p,{cache:'no-store'});
+        if(!r.ok) throw new Error('HTTP '+r.status);
+        return await r.json();
+      }catch(e){errors.push(e.message)}
+    }
+    if(required) throw new Error(errors.join(' / ') || '데이터 로드 실패');
+    return null;
+  }
+
+  function initStaticUI(){
+    $('year').textContent=new Date().getFullYear();
+    $('hall-grid').innerHTML=HALLS.map((h,i)=>`<button class="hall-card" data-hall="${h[0]}"><small>HALL ${String(i+1).padStart(2,'0')}</small><b>${esc(h[1])}</b><span>${artworks.filter(a=>a.category===h[0]).length}개 작품 보기 →</span></button>`).join('');
+    $('artist-grid').innerHTML=CHARS.map(c=>`<button class="artist-card" data-char="${c.id}"><div class="artist-head"><span class="artist-symbol">${c.symbol}</span><span><small>CHARACTER VIEW</small><b>${esc(c.name)}</b><span>${artworks.filter(a=>charsOf(a).includes(c.id)).length}개 작품 모아보기</span></span></div></button>`).join('');
+    $('hall-filter').innerHTML='<option value="all">모든 전시관</option>'+HALLS.map(h=>`<option value="${h[0]}">${esc(h[1])}</option>`).join('');
+    $('character-filter').innerHTML='<option value="all">모든 캐릭터</option>'+CHARS.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')+'<option value="unknown">미분류</option>';
+    $('stat-count').textContent=artworks.length.toLocaleString('ko-KR');
+    $('stat-video').textContent=artworks.filter(isVideo).length.toLocaleString('ko-KR');
+    $('stat-edit').textContent=(Object.keys(overrides).length + Object.keys(localEdits).length).toLocaleString('ko-KR');
+  }
+
+  function buildWall(){
+    const list=artworks.slice(0,18);
+    $('wall-count').textContent=`${list.length} works`;
+    $('wall-track').innerHTML=list.length?list.map(wallCard).join(''):'<div class="empty">등록된 작품이 없습니다.</div>';
+  }
+
+  function filteredArtworks(){
+    const q=$('search').value.trim().toLowerCase();
+    const hall=$('hall-filter').value; const char=$('character-filter').value; const type=$('type-filter').value; const sort=$('sort-filter').value;
+    let arr=artworks.filter(a=>{
+      if(hall!=='all' && a.category!==hall) return false;
+      const chars=charsOf(a);
+      if(char==='unknown'){ if(chars.length!==0) return false; }
+      else if(char!=='all' && !chars.includes(char)) return false;
+      if(type==='video' && !isVideo(a)) return false;
+      if(type==='image' && isVideo(a)) return false;
+      if(q){
+        const hay=[displayTitle(a),a.description,author(a),nameHall(a.category),...(chars.map(prettyChar))].join(' ').toLowerCase();
+        if(!hay.includes(q)) return false;
+      }
+      return true;
+    });
+    if(sort==='latest') arr.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+    if(sort==='oldest') arr.sort((a,b)=>String(a.createdAt||'').localeCompare(String(b.createdAt||'')));
+    if(sort==='title') arr.sort((a,b)=>displayTitle(a).localeCompare(displayTitle(b),'ko'));
+    if(sort==='random') arr=[...arr].sort(()=>Math.random()-.5);
+    return arr;
+  }
+
+  function renderArchive(reset=true){
+    if(reset) visibleCount=12;
+    current=filteredArtworks();
+    const hall=$('hall-filter').value, char=$('character-filter').value;
+    $('count-status').textContent=`${current.length}개 작품`;
+    $('collection-name').textContent = char!=='all' ? (char==='unknown' ? '캐릭터 미분류 작품' : prettyChar(char)) : (hall!=='all' ? nameHall(hall) : '전체 작품');
+    $('filter-status').textContent = `${hall==='all'?'전체 전시관':nameHall(hall)} · ${char==='all'?'모든 캐릭터':(char==='unknown'?'캐릭터 미분류':prettyChar(char))}`;
+    $('archive-grid').innerHTML = current.length ? current.slice(0,visibleCount).map(archiveCard).join('') : '<div class="empty">조건에 맞는 작품이 없습니다.</div>';
+    $('load-more').hidden = visibleCount >= current.length;
+    $('load-more').textContent = `작품 더 보기 (${Math.min(visibleCount,current.length)} / ${current.length})`;
+  }
+
+  function applyEditLocal(){
+    const a=viewerList[viewerIndex]; if(!a) return;
+    const title=$('title-input').value.trim();
+    const nickname=$('nickname-input').value.trim();
+    const msg=$('edit-message');
+    msg.className='message';
+    if(!title || !nickname){ msg.textContent='제목과 닉네임을 모두 입력해 주세요.'; msg.classList.add('err'); return; }
+    localEdits[String(a.id)]={title,nickname,updatedAt:new Date().toISOString(),source:'browser'};
+    saveLocalEdits();
+    $('stat-edit').textContent=(Object.keys(overrides).length + Object.keys(localEdits).length).toLocaleString('ko-KR');
+    msg.textContent='현재 브라우저에서 즉시 적용되었어요. GitHub 없이 여기서 끝나도 됩니다.'; msg.classList.add('ok');
+    updateLightbox(); buildWall(); renderArchive(false);
+  }
+
+  function submitGitHub(){
+    const a=viewerList[viewerIndex]; if(!a) return;
+    const title=$('title-input').value.trim();
+    const nickname=$('nickname-input').value.trim();
+    const msg=$('edit-message');
+    msg.className='message';
+    if(!title || !nickname){ msg.textContent='제목과 닉네임을 모두 입력해 주세요.'; msg.classList.add('err'); return; }
+    const body=`작품 ID: ${a.id}\n새 제목: ${title.replace(/[\r\n]/g,' ')}\n수정자 닉네임: ${nickname.replace(/[\r\n]/g,' ')}`;
+    const issue=`https://github.com/${REPO}/issues/new?title=${encodeURIComponent('[작품 제목 변경] '+a.id)}&body=${encodeURIComponent(body)}`;
+    window.open(issue,'_blank','noopener,noreferrer');
+    msg.textContent='새 탭에서 GitHub 신청 화면을 열었어요. 모든 방문자에게 반영하려면 마지막 제출만 진행하면 됩니다.';
+  }
+
+  function openLightbox(list,id){
+    viewerList=list;
+    viewerIndex=Math.max(0,list.findIndex(a=>String(a.id)===String(id)));
+    $('lightbox').classList.add('open');
+    $('lightbox').setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+    updateLightbox();
+  }
+  function closeLightbox(){
+    $('lightbox').classList.remove('open');
+    $('lightbox').setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+    const vid=$('stage-video'); vid.pause(); vid.removeAttribute('src'); vid.load();
+  }
+  function moveLightbox(step){
+    if(!viewerList.length) return;
+    viewerIndex=(viewerIndex+step+viewerList.length)%viewerList.length;
+    updateLightbox();
+  }
+
+  function updateLightbox(){
+    const a=viewerList[viewerIndex]; if(!a) return;
+    $('light-position').textContent=`${viewerIndex+1} / ${viewerList.length}`;
+    $('detail-title').textContent=displayTitle(a);
+    $('detail-hall').textContent=nameHall(a.category);
+    $('detail-author').textContent=author(a);
+    $('detail-type').textContent=isVideo(a)?'비디오':'이미지';
+    $('detail-meta').textContent=`업로드: ${fmtDate(a.createdAt)}\n캐릭터: ${(charsOf(a).map(prettyChar).join(', ')||'미분류')}`;
+    $('detail-desc').textContent=a.description || '설명이 없는 작품입니다.';
+    const edit=mergedEdit(String(a.id));
+    $('edit-audit').textContent=edit ? `현재 적용 중인 제목 수정: ${edit.title} · 수정자 ${edit.nickname || '기록 없음'}${edit.githubUser ? ' (@'+edit.githubUser+')' : ''}` : '등록된 제목 수정 내역이 없습니다.';
+    $('title-input').value=displayTitle(a); $('nickname-input').value=''; $('edit-message').textContent=''; $('edit-message').className='message';
+
+    const img=$('stage-image'), vid=$('stage-video');
+    if(isVideo(a)){
+      img.hidden=true; img.removeAttribute('src');
+      vid.hidden=false; vid.src=url(mediaPath(a.media||a.image));
+      const post=posterPath(a.poster||a.thumbnail); if(post) vid.poster=url(post); else vid.removeAttribute('poster');
+      vid.load();
+    }else{
+      vid.pause(); vid.hidden=true; vid.removeAttribute('src'); vid.load();
+      img.hidden=false; img.src=url(mediaPath(a.media||a.image)); img.alt=displayTitle(a);
+    }
+  }
+
+  function attachClicks(containerId,listGetter){
+    const el=$(containerId);
+    el.addEventListener('click',e=>{ if(suppressClick) return; const card=e.target.closest('[data-id]'); if(card) openLightbox(listGetter(),card.dataset.id); });
+    el.addEventListener('keydown',e=>{ const card=e.target.closest('[data-id]'); if(card && (e.key==='Enter'||e.key===' ')){ e.preventDefault(); openLightbox(listGetter(),card.dataset.id); } });
+  }
+
+  function enableDragScroll(el){
+    let isDown=false,startX=0,startLeft=0,dragged=false;
+    el.addEventListener('pointerdown',e=>{ if(e.button!==0) return; isDown=true; dragged=false; startX=e.clientX; startLeft=el.scrollLeft; el.classList.add('dragging');});
+    window.addEventListener('pointermove',e=>{ if(!isDown) return; const dx=e.clientX-startX; if(Math.abs(dx)>6) dragged=true; el.scrollLeft=startLeft-dx; });
+    window.addEventListener('pointerup',()=>{ if(isDown && dragged){ suppressClick=true; setTimeout(()=>suppressClick=false,120);} isDown=false; el.classList.remove('dragging'); });
+  }
+
+  function bindUI(){
+    attachClicks('wall-track',()=>artworks.slice(0,18));
+    attachClicks('archive-grid',()=>current);
+    enableDragScroll($('wall-track'));
+    $('wall-prev').addEventListener('click',()=>$('wall-track').scrollBy({left:-520,behavior:'smooth'}));
+    $('wall-next').addEventListener('click',()=>$('wall-track').scrollBy({left:520,behavior:'smooth'}));
+    $('hall-grid').addEventListener('click',e=>{const b=e.target.closest('[data-hall]'); if(!b) return; $('hall-filter').value=b.dataset.hall; $('character-filter').value='all'; renderArchive(); document.getElementById('archive').scrollIntoView({behavior:'smooth'}); });
+    $('artist-grid').addEventListener('click',e=>{const b=e.target.closest('[data-char]'); if(!b) return; $('character-filter').value=b.dataset.char; $('hall-filter').value='all'; renderArchive(); document.getElementById('archive').scrollIntoView({behavior:'smooth'}); });
+    ['search','hall-filter','character-filter','type-filter','sort-filter'].forEach(id=>$(id).addEventListener(id==='search'?'input':'change',()=>renderArchive()));
+    $('clear').addEventListener('click',()=>{ $('search').value=''; $('hall-filter').value='all'; $('character-filter').value='all'; $('type-filter').value='all'; $('sort-filter').value='latest'; renderArchive(); });
+    $('load-more').addEventListener('click',()=>{ visibleCount+=12; renderArchive(false); });
+    $('close-lightbox').addEventListener('click',closeLightbox); $('prev-art').addEventListener('click',()=>moveLightbox(-1)); $('next-art').addEventListener('click',()=>moveLightbox(1));
+    $('fit-view').addEventListener('click',()=>{ $('stage-media').className='stage-media fit'; $('fit-view').classList.add('active'); $('scroll-view').classList.remove('active');});
+    $('scroll-view').addEventListener('click',()=>{ $('stage-media').className='stage-media scroll'; $('scroll-view').classList.add('active'); $('fit-view').classList.remove('active');});
+    $('save-local').addEventListener('click',applyEditLocal); $('submit-github').addEventListener('click',submitGitHub);
+    $('lightbox').addEventListener('click',e=>{ if(e.target === $('lightbox')) closeLightbox(); });
+    document.addEventListener('keydown',e=>{ if(!$('lightbox').classList.contains('open')) return; if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) moveLightbox(-1); if(e.key==='ArrowRight' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) moveLightbox(1); });
+  }
+
+  async function boot(){
+    localEdits=loadLocalEdits();
+    const ts=Date.now();
+    try{
+      const data=await getJson([`./gallery.json?v=${ts}`,`${RAW}gallery.json?v=${ts}`],true);
+      const tagData=await getJson([`./character-tags.json?v=${ts}`,`${RAW}character-tags.json?v=${ts}`]);
+      const overrideData=await getJson([`./title-overrides.json?v=${ts}`,`${RAW}title-overrides.json?v=${ts}`]);
+      tags=(tagData && typeof tagData==='object')?tagData:{};
+      overrides=(overrideData && typeof overrideData==='object')?overrideData:{};
+      artworks=(Array.isArray(data.artworks)?data.artworks:[]).filter(a=>a && mediaPath(a.media||a.image));
+      artworks.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
+      initStaticUI(); buildWall(); renderArchive(); bindUI();
+      $('diag-mini').textContent=`작품 ${artworks.length}개 로드 완료`;
+      $('diag-text').textContent=`작품 ${artworks.length}개, 비디오 ${artworks.filter(isVideo).length}개, 캐릭터 태그 ${Object.keys(tags).length}개, 서버 제목 수정 ${Object.keys(overrides).length}건, 로컬 제목 수정 ${Object.keys(localEdits).length}건을 불러왔습니다.`;
+    }catch(e){
+      bindUI();
+      $('diag-mini').textContent='데이터 로드 실패';
+      $('diag-text').textContent='데이터를 불러오지 못했습니다: '+e.message;
+      $('diagnostic').open=true;
+      $('archive-grid').innerHTML='<div class="empty">작품을 불러오지 못했습니다.</div>';
+      $('wall-track').innerHTML='<div class="empty">뮤지엄 월을 불러오지 못했습니다.</div>';
+      console.error(e);
+    }
+  }
+
+  boot();
 })();
-</script></body></html>
+</script>
+</body>
+</html>
