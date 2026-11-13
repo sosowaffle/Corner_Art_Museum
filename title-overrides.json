@@ -1,1 +1,55 @@
-{}
+
+name: Apply Visitor Title Edits
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: corner-museum-writes
+  cancel-in-progress: false
+
+jobs:
+  title:
+    if: ${{ startsWith(github.event.issue.title, '[작품 제목 변경] ') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Save issue payload
+        env:
+          ISSUE_JSON: ${{ toJSON(github.event) }}
+        run: |
+          printf '%s' "$ISSUE_JSON" > .incoming_title_issue.json
+
+      - name: Validate and apply title edit
+        run: python scripts/apply_title_issue.py
+
+      - name: Commit title change
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add -- title-overrides.json
+
+          if git diff --cached --quiet; then
+            echo "No valid title changes."
+          else
+            git commit -m "museum: record public title edit"
+            git pull --rebase origin main
+            git push origin HEAD:main
+          fi
