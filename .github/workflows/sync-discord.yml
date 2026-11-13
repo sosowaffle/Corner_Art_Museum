@@ -1,27 +1,137 @@
 
-      - name: Commit updated profile pictures
+name: Sync Discord Artworks
+
+on:
+  schedule:
+    - cron: "7,17,27,37,47,57 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: discord-art-museum-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Sync Discord Gallery
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Restore artwork database
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          import subprocess
+          from pathlib import Path
+
+          path = Path("gallery.json")
+
+          def valid(raw):
+              try:
+                  obj = json.loads(raw)
+                  return (
+                      isinstance(obj, dict)
+                      and isinstance(obj.get("artworks"), list)
+                      and not obj.get("demo", False)
+                  )
+              except (ValueError, TypeError):
+                  return False
+
+          current = path.read_bytes() if path.exists() else b""
+
+          if valid(current):
+              print("Artwork database is valid.")
+          else:
+              print("Searching Git history...")
+              commits = subprocess.check_output(
+                  ["git", "log", "--format=%H", "--", "gallery.json"],
+                  text=True
+              ).splitlines()
+
+              restored = False
+
+              for commit in commits:
+                  try:
+                      data = subprocess.check_output(
+                          ["git", "show", f"{commit}:gallery.json"],
+                          stderr=subprocess.DEVNULL
+                      )
+                  except subprocess.CalledProcessError:
+                      continue
+
+                  if valid(data):
+                      path.write_bytes(data)
+                      restored = True
+                      print("Artwork database restored.")
+                      break
+
+              if not restored:
+                  raise SystemExit(
+                      "No valid artwork database found."
+                  )
+          PY
+
+      - name: Check Discord bot token
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        run: |
+          if [ -z "$DISCORD_BOT_TOKEN" ]; then
+            echo "::error::Missing Discord bot token."
+            exit 1
+          fi
+
+      - name: Fetch artwork from Discord
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        run: |
+          python scripts/sync_discord.py
+
+      - name: Fetch Discord profile pictures
+        env:
+          DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
+        run: |
+          if [ -f scripts/sync_discord_avatars.py ]; then
+            python scripts/sync_discord_avatars.py
+          else
+            echo "Avatar script not found. Skipping."
+          fi
+
+      - name: Save museum updates
         shell: bash
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          mkdir -p assets/avatars
-
-          if [ -d "scripts/assets/avatars" ]; then
-            find scripts/assets/avatars \
-              -maxdepth 1 -type f -name "*.png" \
-              -exec cp {} assets/avatars/ \;
+          if [ -d scripts/assets/avatars ]; then
+            mkdir -p assets/avatars
+            cp -n scripts/assets/avatars/* \
+              assets/avatars/ 2>/dev/null || true
           fi
 
-          git add -A -- assets/avatars/
+          git add -A
 
           if git diff --cached --quiet; then
-            echo "No new profile pictures to save."
+            echo "No new changes to save."
             exit 0
           fi
 
-          git commit -m "museum: update Discord avatars"
+          git commit -m "museum: sync artworks and avatars"
           git pull --rebase origin main
           git push origin HEAD:main
 
-          echo "Profile pictures saved successfully."
+          echo "Museum update completed."
