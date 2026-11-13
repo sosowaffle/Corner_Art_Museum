@@ -481,58 +481,77 @@
     $('stat-edit').textContent=(Object.keys(overrides).length + Object.keys(localEdits).length).toLocaleString('ko-KR');
   }
 
-  // Gentle auto-tour; never forces the page to scroll and pauses for user input.
-  const autoTour={enabled:!window.matchMedia('(prefers-reduced-motion: reduce)').matches,
-    visible:false,down:false,resumeAt:0,lastFrame:0,raf:0,speed:23};
-  function holdAutoTour(ms=5000){autoTour.resumeAt=performance.now()+ms;autoTour.lastFrame=0;}
+  // Auto-tour: start whenever part of the wall enters the viewport.
+  // Explicitly calculate visibility each frame: a tall museum wall can never
+  // meet some IntersectionObserver percentage thresholds on small screens.
+  const autoTour = {
+    enabled: true, down: false, resumeAt: 0, lastFrame: 0, raf: 0,
+    speed: 65, pausedByHover: false
+  };
+  function holdAutoTour(ms=3000){
+    autoTour.resumeAt = performance.now() + ms;
+    autoTour.lastFrame = 0;
+  }
   function updateAutoTourButton(){
     const b=$('wall-autoplay');
     if(!b)return;
     b.textContent=autoTour.enabled?'⏸ 자동 관람 끄기':'▶ 자동 관람 켜기';
     b.setAttribute('aria-pressed',String(autoTour.enabled));
   }
+  function wallOnScreen(){
+    const wall=document.querySelector('.museum-wall');
+    if(!wall)return false;
+    const r=wall.getBoundingClientRect();
+    return r.bottom>0 && r.top<window.innerHeight;
+  }
   function autoTourStep(now){
     autoTour.raf=requestAnimationFrame(autoTourStep);
-    const dt=autoTour.lastFrame?Math.min(now-autoTour.lastFrame,80):0;
+    const dt=autoTour.lastFrame ? Math.min(now-autoTour.lastFrame,70) : 0;
     autoTour.lastFrame=now;
-    if(!autoTour.enabled||!autoTour.visible||autoTour.down||
-       now<autoTour.resumeAt||document.hidden||$('lightbox').classList.contains('open'))return;
-    const rail=$('wall-track');
-    if(!rail)return;
-    let max=rail.scrollWidth-rail.clientWidth;
-    if(max<=1)return;
-    if(rail.scrollLeft>=max-1100 && wallVisibleCount<artworks.length){appendWall(28);max=rail.scrollWidth-rail.clientWidth;}
-    if(rail.scrollLeft>=max-2){
-      rail.scrollLeft=0;
-      holdAutoTour(2500);
+    const wall=$('wall-track');
+    if(!wall || !autoTour.enabled || autoTour.down || document.hidden ||
+       !wallOnScreen() || now<autoTour.resumeAt ||
+       $('lightbox').classList.contains('open'))return;
+    let max=wall.scrollWidth-wall.clientWidth;
+    if(max<2){
+      if(wallVisibleCount<artworks.length)appendWall(28);
       return;
     }
-    rail.scrollLeft=Math.min(max,rail.scrollLeft+autoTour.speed*dt/1000);
+    // Add further artworks before reaching the end, until all are available.
+    if(wall.scrollLeft>max-1400 && wallVisibleCount<artworks.length){
+      appendWall(28);
+      max=wall.scrollWidth-wall.clientWidth;
+    }
+    if(wall.scrollLeft>=max-2){
+      wall.scrollLeft=0;
+      holdAutoTour(800);
+      return;
+    }
+    wall.scrollLeft=Math.min(max,wall.scrollLeft+autoTour.speed*dt/1000);
   }
   function initializeAutoTour(){
     const wall=document.querySelector('.museum-wall');
     const rail=$('wall-track');
     if(!wall||!rail)return;
-    if('IntersectionObserver' in window){
-      new IntersectionObserver(entries=>{
-        autoTour.visible=entries.some(e=>e.isIntersecting);
-        autoTour.lastFrame=0;
-      },{threshold:.12}).observe(wall);
-    }else{autoTour.visible=true;}
-    $('wall-autoplay').addEventListener('click',()=>{
+    const control=$('wall-autoplay');
+    control.addEventListener('click',()=>{
       autoTour.enabled=!autoTour.enabled;
-      autoTour.resumeAt=performance.now()+(autoTour.enabled?1300:0);
+      autoTour.resumeAt=performance.now()+(autoTour.enabled?300:0);
       autoTour.lastFrame=0;
       updateAutoTourButton();
     });
     updateAutoTourButton();
-    holdAutoTour(2400);
+    // Begin soon after the user scrolls the wall into view.
+    holdAutoTour(500);
     autoTour.raf=requestAnimationFrame(autoTourStep);
-    // When held, movement does not restart until the pointer is released.
     wall.addEventListener('pointerdown',()=>{autoTour.down=true;holdAutoTour()},{passive:true});
-    window.addEventListener('pointerup',()=>{if(autoTour.down){autoTour.down=false;holdAutoTour();}},{passive:true});
+    window.addEventListener('pointerup',()=>{
+      if(autoTour.down){autoTour.down=false;holdAutoTour()}
+    },{passive:true});
     window.addEventListener('pointercancel',()=>{autoTour.down=false;holdAutoTour()},{passive:true});
     window.addEventListener('blur',()=>{autoTour.down=false;holdAutoTour()});
+    // Pausing after a real manual wheel/drag is intentional; passive scroll
+    // events caused by this auto-tour must not reset the pause timer.
   }
 
   function buildWall(){
