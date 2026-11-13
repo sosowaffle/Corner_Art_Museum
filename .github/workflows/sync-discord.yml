@@ -1,4 +1,3 @@
-
 name: Sync Discord Artworks
 
 on:
@@ -59,23 +58,43 @@ jobs:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
         run: python scripts/sync_discord.py
 
+      - name: Install character classifier dependencies
+        run: python -m pip install --quiet "openai>=1.0,<3" "Pillow>=10,<13"
+
+      - name: Auto-classify fictional characters in artworks
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          CHARACTER_CLASSIFY_BATCH: '10'
+          CHARACTER_VISION_MODEL: 'gpt-4.1-mini'
+        run: python scripts/classify_characters.py
+
       - name: Verify deleted Discord artworks
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
           DELETION_AUDIT_BATCH: '60'
-        run: python scripts/sync_discord_deletions.py
+        run: |
+          if [ -f scripts/sync_discord_deletions.py ]; then
+            python scripts/sync_discord_deletions.py
+          else
+            echo "Deletion checker not found; skipping."
+          fi
 
       - name: Update Discord profile pictures
         env:
           DISCORD_BOT_TOKEN: ${{ secrets.DISCORD_BOT_TOKEN }}
-        run: python scripts/sync_discord_avatars.py
+        run: |
+          if [ -f scripts/sync_discord_avatars.py ]; then
+            python scripts/sync_discord_avatars.py
+          else
+            echo "Avatar downloader not found; skipping."
+          fi
 
       - name: Commit artwork and avatar updates
         shell: bash
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add -- gallery.json sync-state.json
+          git add -- gallery.json sync-state.json character-tags.json
           if [ -d assets/artworks ]; then
             git add -A -- assets/artworks
           fi
