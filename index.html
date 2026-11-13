@@ -202,7 +202,13 @@
     @media(max-width:1200px){.lightbox .light-shell{height:100%;overflow:auto}.stage-panel{flex:0 0 auto;height:68vh;min-height:420px}.stage-mat{height:100%;min-height:0}}
     @media(max-width:760px){.lightbox .light-shell{padding-top:38px}.stage-panel{height:65vh;min-height:350px}.stage-frame{min-height:0}.lightbox-close-x{right:10px;top:8px}}
 
-  </style>
+    .wall-filterbar{display:flex;flex-wrap:wrap;align-items:center;gap:12px;padding:16px 18px;margin:0 0 16px;border-radius:14px;background:var(--panel);border:1px solid var(--line)}
+  .wall-filterbar label{font-weight:700;font-size:14px;color:var(--ink)}
+  .wall-filterbar select{max-width:100%;min-width:180px;padding:11px 14px;border:1px solid var(--line);border-radius:10px;background:#11110f;color:var(--ink);font:inherit;cursor:pointer}
+  .wall-filterbar select[hidden]{display:none!important}
+  .wall-filter-summary{color:var(--sub);font-size:13px;margin-left:auto}
+  @media(max-width:760px){.wall-filterbar{align-items:stretch}.wall-filterbar label{width:100%}.wall-filterbar select{width:100%}.wall-filter-summary{margin-left:0;width:100%}}
+</style>
 </head>
 <body>
   <header class="shell topbar">
@@ -239,13 +245,24 @@
         <div>
           <div class="eyebrow">01 / WALL GALLERY</div>
           <h2>전시벽 미술관</h2>
-          <p>전체 작품을 전시 벽에서 차례대로 감상해 보세요. 큰 액자로 한 작품씩 둘러보고, 만화는 클릭한 뒤 원본 크기로 스크롤하며 읽을 수 있어요.</p>
+          <p>전체 작품 또는 원하는 전시 채널·업로드 작가·등장 캐릭터를 골라 전시 벽에서 감상해 보세요. 큰 액자로 한 작품씩 둘러보고, 만화는 클릭한 뒤 원본 크기로 스크롤하며 읽을 수 있어요.</p>
         </div>
         <div class="buttons">
           <button class="btn" id="wall-prev">← 이전</button>
           <button class="btn" id="wall-next">다음 →</button>
           <button class="btn" id="wall-autoplay" type="button" aria-pressed="true">⏸ 자동 관람 끄기</button>
         </div>
+      </div>
+      <div class="wall-filterbar" aria-label="전시벽 작품 분류">
+        <label for="wall-filter-type">전시 작품 분류</label>
+        <select id="wall-filter-type" aria-label="전시벽 분류 기준">
+          <option value="all">전체 작품</option>
+          <option value="hall">전시 채널별</option>
+          <option value="author">업로드 작가별</option>
+          <option value="character">등장 캐릭터별</option>
+        </select>
+        <select id="wall-filter-value" aria-label="분류 상세 선택" hidden></select>
+        <span id="wall-filter-summary" class="wall-filter-summary" aria-live="polite">전체 작품 자동 관람</span>
       </div>
       <div class="museum-wall">
         <div class="museum-ceiling" aria-hidden="true"></div>
@@ -417,7 +434,7 @@
   const nameHall=id=>(HALLS.find(v=>v[0]===id)||[])[1]||id||'전시관 미지정';
   const prettyChar=id=>(CHARS.find(v=>v.id===id)?.name)||'미분류';
   const author=a=>a.uploaderName||a.authorName||a.author||a.username||'작성자 미상';
-  let artworks=[], tags={}, overrides={}, localEdits={}, localTags={}, current=[], viewerList=[], viewerIndex=0, visibleCount=12, wallVisibleCount=28, wallLoading=false, suppressClick=false;
+  let artworks=[], wallArtworks=[], tags={}, overrides={}, localEdits={}, localTags={}, current=[], viewerList=[], viewerIndex=0, visibleCount=12, wallVisibleCount=28, wallLoading=false, suppressClick=false;
 
   function loadLocalEdits(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}')}catch(_){return {}}}
   function saveLocalEdits(){localStorage.setItem(LS_KEY, JSON.stringify(localEdits))}
@@ -487,7 +504,7 @@
     enabled: true, down: false, resumeAt: 0, lastFrame: 0, raf: 0,
     speed: 46, position: null, moving: false
   };
-  function holdAutoTour(ms=3000){
+  function holdAutoTour(ms=0){
     autoTour.resumeAt = performance.now() + ms;
     autoTour.lastFrame = 0;
     autoTour.position = null;
@@ -499,7 +516,7 @@
     if(!b)return;
     b.textContent=autoTour.enabled?'⏸ 자동 관람 끄기':'▶ 자동 관람 켜기';
     b.setAttribute('aria-pressed',String(autoTour.enabled));
-    b.title=autoTour.enabled ? (autoTour.moving?'작품이 자동으로 이동 중입니다':'잠시 뒤 자동으로 이동합니다') : '자동 관람이 꺼져 있습니다';
+    b.title=autoTour.enabled ? (autoTour.moving?'작품이 자동으로 이동 중입니다':'조작이 끝나면 자동으로 이동합니다') : '자동 관람이 꺼져 있습니다';
   }
   function autoTourStep(now){
     autoTour.raf=requestAnimationFrame(autoTourStep);
@@ -514,14 +531,14 @@
     }
 
     let max=rail.scrollWidth-rail.clientWidth;
-    if(max<2 && wallVisibleCount<artworks.length){
+    if(max<2 && wallVisibleCount<wallArtworks.length){
       appendWall(28);
       max=rail.scrollWidth-rail.clientWidth;
     }
     if(max<2)return;
 
     // Always append upcoming artworks before arriving at the current end.
-    if(rail.scrollLeft>=max-1600 && wallVisibleCount<artworks.length){
+    if(rail.scrollLeft>=max-1600 && wallVisibleCount<wallArtworks.length){
       appendWall(28);
       max=rail.scrollWidth-rail.clientWidth;
     }
@@ -532,7 +549,7 @@
       // All works viewed: restart after a brief pause.
       rail.scrollLeft=0;
       autoTour.position=0;
-      autoTour.resumeAt=now+900;
+      autoTour.resumeAt=now;
       return;
     }
     autoTour.position=Math.min(max,autoTour.position+autoTour.speed*dt/1000);
@@ -545,14 +562,14 @@
     const control=$('wall-autoplay');
     control.addEventListener('click',()=>{
       autoTour.enabled=!autoTour.enabled;
-      autoTour.resumeAt=performance.now()+(autoTour.enabled?300:0);
+      autoTour.resumeAt=performance.now();
       autoTour.position=null;
       autoTour.lastFrame=0;
       autoTour.moving=false;
       updateAutoTourButton();
     });
     updateAutoTourButton();
-    holdAutoTour(800);
+    holdAutoTour(0);
     cancelAnimationFrame(autoTour.raf);
     autoTour.raf=requestAnimationFrame(autoTourStep);
     rail.addEventListener('pointerdown',()=>{autoTour.down=true;holdAutoTour()},{passive:true});
@@ -563,24 +580,63 @@
     window.addEventListener('blur',()=>{autoTour.down=false;holdAutoTour()});
   }
 
+  function selectedWallArtworks(){
+    const type=$('wall-filter-type').value;
+    const value=$('wall-filter-value').value;
+    if(type==='all')return artworks;
+    if(type==='hall')return artworks.filter(a=>a.category===value);
+    if(type==='author')return artworks.filter(a=>author(a)===value);
+    if(type==='character')return artworks.filter(a=>value==='unknown'?charsOf(a).length===0:charsOf(a).includes(value));
+    return artworks;
+  }
+
+  function updateWallFilterChoices(){
+    const type=$('wall-filter-type').value;
+    const selector=$('wall-filter-value');
+    const old=selector.value;
+    let options=[];
+    if(type==='hall') options=HALLS.map(([id,name])=>[id,name]);
+    if(type==='author') options=[...new Set(artworks.map(author))].sort((a,b)=>a.localeCompare(b,'ko')).map(name=>[name,name]);
+    if(type==='character') options=[...CHARS.map(c=>[c.id,c.name]),['unknown','캐릭터 미분류']];
+    selector.hidden=type==='all';
+    selector.innerHTML=options.map(([value,label])=>`<option value="${esc(value)}">${esc(label)}</option>`).join('');
+    if(options.some(([v])=>v===old))selector.value=old;
+    updateWallSelection();
+  }
+
+  function updateWallSelection(){
+    wallArtworks=selectedWallArtworks();
+    wallVisibleCount=Math.min(28,wallArtworks.length);
+    const rail=$('wall-track');
+    rail.scrollLeft=0;
+    autoTour.position=null;
+    autoTour.lastFrame=0;
+    autoTour.resumeAt=0;
+    const type=$('wall-filter-type').value;
+    const valueLabel=type==='all'?'전체 작품':$('wall-filter-value').selectedOptions[0]?.textContent||'선택 없음';
+    $('wall-filter-summary').textContent=`${valueLabel} · ${wallArtworks.length.toLocaleString('ko-KR')}개 작품`;
+    buildWall();
+    updateAutoTourButton();
+  }
+
   function buildWall(){
-    wallVisibleCount=Math.max(28,Math.min(wallVisibleCount,artworks.length));
-    const list=artworks.slice(0,wallVisibleCount);
-    $('wall-count').textContent=`${artworks.length.toLocaleString('ko-KR')} works`;
-    $('wall-track').innerHTML=list.length?list.map(wallCard).join(''):'<div class="empty">등록된 작품이 없습니다.</div>';
+    wallVisibleCount=Math.min(wallArtworks.length,Math.max(28,wallVisibleCount));
+    const list=wallArtworks.slice(0,wallVisibleCount);
+    $('wall-count').textContent=`${wallArtworks.length.toLocaleString('ko-KR')} works`;
+    $('wall-track').innerHTML=list.length?list.map(wallCard).join(''):'<div class="empty">이 분류에 해당하는 작품이 없습니다. 다른 분류를 선택해 주세요.</div>';
     updateWallProgress();
   }
 
   function updateWallProgress(){
-    const count=Math.min(wallVisibleCount,artworks.length);
-    $('wall-progress').textContent=`전시 중 ${count.toLocaleString('ko-KR')} / 전체 ${artworks.length.toLocaleString('ko-KR')}개`;
-    $('wall-load-more').hidden=count>=artworks.length;
+    const count=Math.min(wallVisibleCount,wallArtworks.length);
+    $('wall-progress').textContent=`전시 중 ${count.toLocaleString('ko-KR')} / 해당 분류 전체 ${wallArtworks.length.toLocaleString('ko-KR')}개`;
+    $('wall-load-more').hidden=count>=wallArtworks.length;
   }
 
   function appendWall(batch=28){
-    if(wallLoading||wallVisibleCount>=artworks.length)return;
+    if(wallLoading||wallVisibleCount>=wallArtworks.length)return;
     wallLoading=true;
-    const list=artworks.slice(wallVisibleCount,wallVisibleCount+batch);
+    const list=wallArtworks.slice(wallVisibleCount,wallVisibleCount+batch);
     $('wall-track').insertAdjacentHTML('beforeend',list.map(wallCard).join(''));
     wallVisibleCount+=list.length;
     updateWallProgress();
@@ -633,7 +689,7 @@
     saveLocalEdits();
     $('stat-edit').textContent=(Object.keys(overrides).length + Object.keys(localEdits).length).toLocaleString('ko-KR');
     msg.textContent='현재 브라우저에서 즉시 적용되었어요. GitHub 없이 여기서 끝나도 됩니다.'; msg.classList.add('ok');
-    updateLightbox(); buildWall(); renderArchive(false);
+    updateLightbox(); updateWallSelection(); renderArchive(false);
   }
 
   function saveCharacterLocal(){
@@ -643,7 +699,7 @@
     try{localStorage.setItem(LS_CHAR_KEY,JSON.stringify(localTags))}catch(e){$('character-save-status').textContent='브라우저 저장소 접근이 차단되어 저장되지 않았습니다.';return}
     $('character-save-status').textContent='이 브라우저의 캐릭터 분류가 반영됐어요. 전체 방문자에게 공개되지는 않습니다.';
     $('detail-meta').textContent=`업로드: ${fmtDate(a.createdAt)}\n캐릭터: ${(charsOf(a).map(prettyChar).join(', ')||'미분류')}`;
-    initStaticUI();renderArchive(false);
+    initStaticUI();updateWallSelection();renderArchive(false);
   }
 
   function submitGitHub(){
@@ -669,7 +725,7 @@
     updateLightbox();
   }
   function closeLightbox(){
-    holdAutoTour(2800);
+    holdAutoTour(0);
     $('lightbox').classList.remove('open');
     $('lightbox').setAttribute('aria-hidden','true');
     document.body.style.overflow='';
@@ -762,12 +818,12 @@
     wallEl.addEventListener('click',e=>{
       if(suppressClick)return;
       const c=e.target.closest('.wall-piece[data-id]');
-      if(c)openLightbox(artworks,c.dataset.id);
+      if(c)openLightbox(wallArtworks,c.dataset.id);
     });
     wallEl.addEventListener('keydown',e=>{
       if(e.key!=='Enter'&&e.key!==' ')return;
       const c=e.target.closest('.wall-piece[data-id]');
-      if(c){e.preventDefault();openLightbox(artworks,c.dataset.id)}
+      if(c){e.preventDefault();openLightbox(wallArtworks,c.dataset.id)}
     });
     attachClicks('archive-grid',()=>current);
     enableDragScroll($('wall-track'));
@@ -787,13 +843,15 @@
       const before=rail.scrollLeft;
       const next=Math.max(0,Math.min(max,before+delta*factor));
       if(Math.abs(next-before)>0.5){
-        holdAutoTour();
+        holdAutoTour(130); // 휠 입력이 끝나면 즉시 자동 관람 재개
         e.preventDefault();
         rail.scrollLeft=next;
       }
       // When the rail reaches either end, allow normal page scrolling.
     },{passive:false,capture:true});
-    $('wall-load-more').addEventListener('click',()=>appendWall(artworks.length));
+    $('wall-filter-type').addEventListener('change',updateWallFilterChoices);
+    $('wall-filter-value').addEventListener('change',updateWallSelection);
+    $('wall-load-more').addEventListener('click',()=>appendWall(wallArtworks.length));
     $('wall-track').addEventListener('scroll',()=>{
       const rail=$('wall-track');
       if(rail.scrollWidth-rail.clientWidth-rail.scrollLeft<1000) appendWall(28);
@@ -844,7 +902,7 @@
       overrides=(overrideData && typeof overrideData==='object')?overrideData:{};
       artworks=(Array.isArray(data.artworks)?data.artworks:[]).filter(a=>a && mediaPath(a.media||a.image));
       artworks.sort((a,b)=>String(b.createdAt||'').localeCompare(String(a.createdAt||'')));
-      initStaticUI(); buildWall(); renderArchive(); bindUI(); initializeAutoTour();
+      initStaticUI(); updateWallFilterChoices(); renderArchive(); bindUI(); initializeAutoTour();
       $('diag-mini').textContent=`작품 ${artworks.length}개 로드 완료`;
       $('diag-text').textContent=`작품 ${artworks.length}개, 비디오 ${artworks.filter(isVideo).length}개, 캐릭터 태그 ${Object.keys(tags).length}개, 서버 제목 수정 ${Object.keys(overrides).length}건, 로컬 제목 수정 ${Object.keys(localEdits).length}건을 불러왔습니다.`;
     }catch(e){
