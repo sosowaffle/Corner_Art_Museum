@@ -390,27 +390,14 @@
     const arr=Array.isArray(t)?t:(t&&Array.isArray(t.characters)?t.characters:[]);
     return arr.filter(id=>CHARS.some(c=>c.id===id));
   }
- 
-function avatarHTML(c) {
-  const avatarURL =
-    `https://raw.githubusercontent.com/sosowaffle/Corner_Art_Museum/main/assets/avatars/${c.id}.png`;
-
-  return `
-    <span class="artist-symbol">
-      <img
-        class="artist-avatar"
-        src="${avatarURL}"
-        alt="${esc(c.name)} 프로필 사진"
-        loading="lazy"
-        onerror="this.hidden=true;this.nextElementSibling.hidden=false"
-      >
-      <span class="avatar-fallback" hidden>
-        ${c.symbol}
-      </span>
-    </span>
-  `;
-}
-
+  let avatarRevisions={};
+  function avatarHTML(c){
+    // Hash-based URL refresh: changes when the Discord avatar changes.
+    // Fallback to a cache-busting request when the revision manifest is absent.
+    const revision=avatarRevisions[c.id]||String(Date.now());
+    const src=`https://raw.githubusercontent.com/${REPO}/main/assets/avatars/${encodeURIComponent(c.id)}.png?v=${encodeURIComponent(revision)}`;
+    return `<span class="artist-symbol"><img class="artist-avatar" alt="${esc(c.name)} 디스코드 프로필 사진" src="${esc(src)}" loading="lazy" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="avatar-fallback" hidden>${c.symbol}</span></span>`;
+  }
   function mediaHTML(a,forWall=false){
     const src=mediaPath(a.media||a.image); if(!src) return '<div>미디어 없음</div>';
     if(isVideo(a)){
@@ -618,21 +605,31 @@ function avatarHTML(c) {
     el.addEventListener('lostpointercapture',finish);
     window.addEventListener('pointerup',finish);
     window.addEventListener('blur',()=>finish());
-    // Mouse wheel scrolls the exhibition horizontally; when at either end, allow page scroll.
-    el.addEventListener('wheel',e=>{
-      const max=el.scrollWidth-el.clientWidth;
-      if(max<=1)return;
-      const delta=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
-      const units=e.deltaMode===1?18:e.deltaMode===2?el.clientWidth:1;
-      const next=Math.max(0,Math.min(max,el.scrollLeft+delta*units));
-      if(Math.abs(next-el.scrollLeft)>0.2){e.preventDefault();el.scrollLeft=next}
-    },{passive:false});
   }
 
   function bindUI(){
     attachClicks('wall-track',()=>artworks.slice(0,18));
     attachClicks('archive-grid',()=>current);
     enableDragScroll($('wall-track'));
+    // Listen on the WHOLE museum wall (capture phase), including frame images,
+    // captions, museum lights and the space above the rail.
+    const museumWall=document.querySelector('.museum-wall');
+    museumWall.addEventListener('wheel',e=>{
+      if(e.ctrlKey) return; // preserve browser zoom gesture
+      const rail=$('wall-track');
+      const max=Math.max(0,rail.scrollWidth-rail.clientWidth);
+      if(max<1) return;
+      const delta=Math.abs(e.deltaX)>Math.abs(e.deltaY)?e.deltaX:e.deltaY;
+      const factor=e.deltaMode===1?20:e.deltaMode===2?rail.clientWidth:1;
+      const before=rail.scrollLeft;
+      const next=Math.max(0,Math.min(max,before+delta*factor));
+      if(Math.abs(next-before)>0.5){
+        e.preventDefault();
+        e.stopPropagation();
+        rail.scrollLeft=next;
+      }
+      // At the first/last frame, let vertical scrolling continue naturally.
+    },{passive:false,capture:true});
     $('wall-prev').addEventListener('click',()=>$('wall-track').scrollBy({left:-520,behavior:'smooth'}));
     $('wall-next').addEventListener('click',()=>$('wall-track').scrollBy({left:520,behavior:'smooth'}));
     $('hall-grid').addEventListener('click',e=>{const b=e.target.closest('[data-hall]'); if(!b) return; $('hall-filter').value=b.dataset.hall; $('character-filter').value='all'; renderArchive(); document.getElementById('archive').scrollIntoView({behavior:'smooth'}); });
@@ -657,6 +654,8 @@ function avatarHTML(c) {
       const data=await getJson([`./gallery.json?v=${ts}`,`${RAW}gallery.json?v=${ts}`],true);
       const tagData=await getJson([`./character-tags.json?v=${ts}`,`${RAW}character-tags.json?v=${ts}`]);
       const overrideData=await getJson([`./title-overrides.json?v=${ts}`,`${RAW}title-overrides.json?v=${ts}`]);
+      const avatarData=await getJson([`./assets/avatars/versions.json?v=${ts}`,`${RAW}assets/avatars/versions.json?v=${ts}`]);
+      avatarRevisions=(avatarData && typeof avatarData==='object')?avatarData:{};
       tags=(tagData && typeof tagData==='object')?tagData:{};
       overrides=(overrideData && typeof overrideData==='object')?overrideData:{};
       artworks=(Array.isArray(data.artworks)?data.artworks:[]).filter(a=>a && mediaPath(a.media||a.image));
