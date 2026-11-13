@@ -156,6 +156,27 @@
     .stage-media.fit{align-items:center}
     .stage-media.fit img{max-height:100%;max-width:100%;object-fit:contain}
 
+
+    /* 2026 museum wall readability improvements */
+    .museum-wall{min-height:820px}
+    .wall-guide{padding-top:90px}
+    .wall-track{min-height:635px;gap:72px;padding:22px 50px 48px;align-items:center;scroll-behavior:auto}
+    .wall-piece{min-width:400px;max-width:780px;padding:20px 18px 22px}
+    .wall-piece .frame-wrap{padding:16px}
+    .wall-piece .frame-inner{padding:10px}
+    .wall-piece .frame-media img,.wall-piece .frame-media video{max-width:min(65vw,720px);max-height:590px;object-fit:contain}
+    .wall-piece .wall-caption{max-width:640px;font-size:14px}
+    .wall-piece .frame-wrap{pointer-events:none}
+    .wall-load-row{position:relative;z-index:4;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:8px 26px 25px;color:var(--sub);font-size:12px}
+    .wall-load-row button{background:#181714;border-color:#9b8966}
+    .wall-piece:focus-visible{outline:3px solid var(--gold);outline-offset:4px}
+    .wall-open{border:1px solid #b8a37a;background:#1d1914e8;color:#eee4d0;padding:7px 15px;border-radius:999px;font-size:12px;font-weight:700;position:relative;z-index:4}
+    .wall-open:hover{background:#423727}
+    .wall-piece:hover{filter:drop-shadow(0 16px 16px #0009)}
+    .lightbox .stage-mat{scrollbar-color:#bba57b #211d19;overscroll-behavior:contain}
+    .stage-media.scroll img{max-width:none;max-height:none;width:auto;height:auto}
+    @media(max-width:760px){.museum-wall{min-height:640px}.wall-track{min-height:460px;gap:24px;padding:20px 18px 32px}.wall-piece{min-width:290px;max-width:94vw;padding:12px}.wall-piece .frame-media img,.wall-piece .frame-media video{max-width:min(78vw,520px);max-height:400px}.wall-load-row{padding:8px 18px 24px}}
+
     @media (max-width:1200px){
       .hero{grid-template-columns:1fr}.archive-grid,.hall-grid,.artist-grid{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr 1fr 1fr}.filters > :first-child{grid-column:1/-1}.light-shell{grid-template-columns:1fr;overflow:auto}.stage-panel{min-height:55vh}
     }
@@ -170,7 +191,7 @@
   <header class="shell topbar">
     <a href="#top" class="brand"><span class="brand-mark">◫</span><span>코너의 미술관</span></a>
     <nav class="topnav">
-      <a href="#wall">뮤지엄 월</a>
+      <a href="#wall">전시벽 미술관</a>
       <a href="#halls">전시관</a>
       <a href="#artists">캐릭터</a>
       <a href="#archive">전체 작품</a>
@@ -199,9 +220,9 @@
     <section id="wall">
       <div class="section-head">
         <div>
-          <div class="eyebrow">01 / MUSEUM WALL</div>
-          <h2>마우스로 훑어보는 전시 벽</h2>
-          <p>실제 전시 복도를 바라보듯 조명이 켜진 벽을 따라 감상해 보세요. 클릭해서 끌고 놓으면 즉시 멈추고, 마우스 휠로도 좌우 이동할 수 있어요.</p>
+          <div class="eyebrow">01 / WALL GALLERY</div>
+          <h2>전시벽 미술관</h2>
+          <p>전체 작품을 전시 벽에서 차례대로 감상해 보세요. 큰 액자로 한 작품씩 둘러보고, 만화는 클릭한 뒤 원본 크기로 스크롤하며 읽을 수 있어요.</p>
         </div>
         <div class="buttons">
           <button class="btn" id="wall-prev">← 이전</button>
@@ -215,32 +236,33 @@
         <div class="museum-baseboard" aria-hidden="true"></div>
         <div class="museum-floor-lines" aria-hidden="true"></div>
         <div class="wall-guide">
-          <p>마우스를 누르고 드래그 → 놓으면 즉시 정지 · 휠로 좌우 이동 · 작품 클릭으로 확대</p>
+          <p>드래그로 이동 · 놓으면 정지 · 휠로 좌우 이동 · 클릭하면 크게 감상</p>
           <span class="pill" id="wall-count">0 works</span>
         </div>
-        <div id="wall-track" class="wall-track" aria-label="가로 전시 벽"></div>
+        <div id="wall-track" class="wall-track" aria-label="전체 작품 가로 전시 벽"></div>
+        <div class="wall-load-row"><span id="wall-progress">0 / 0</span><button type="button" class="btn" id="wall-load-more">전시 작품 더 불러오기 →</button></div>
       </div>
-    </section>
-
-    <section id="halls">
-      <div class="section-head">
-        <div>
-          <div class="eyebrow">02 / EXHIBITION HALLS</div>
-          <h2>전시관 둘러보기</h2>
-        </div>
-      </div>
-      <div id="hall-grid" class="hall-grid"></div>
     </section>
 
     <section id="artists">
       <div class="section-head">
         <div>
-          <div class="eyebrow">03 / CHARACTER VIEW</div>
+          <div class="eyebrow">02 / CHARACTER VIEW</div>
           <h2>캐릭터별로 보기</h2>
           <p>업로드한 사람과 별개로, 작품이 어떤 캐릭터인지 기준으로 모아볼 수 있습니다.</p>
         </div>
       </div>
       <div id="artist-grid" class="artist-grid"></div>
+    </section>
+
+    <section id="halls">
+      <div class="section-head">
+        <div>
+          <div class="eyebrow">03 / EXHIBITION HALLS</div>
+          <h2>전시관 둘러보기</h2>
+        </div>
+      </div>
+      <div id="hall-grid" class="hall-grid"></div>
     </section>
 
     <section id="archive">
@@ -375,7 +397,7 @@
   const nameHall=id=>(HALLS.find(v=>v[0]===id)||[])[1]||id||'전시관 미지정';
   const prettyChar=id=>(CHARS.find(v=>v.id===id)?.name)||'미분류';
   const author=a=>a.uploaderName||a.authorName||a.author||a.username||'작성자 미상';
-  let artworks=[], tags={}, overrides={}, localEdits={}, localTags={}, current=[], viewerList=[], viewerIndex=0, visibleCount=12, suppressClick=false;
+  let artworks=[], tags={}, overrides={}, localEdits={}, localTags={}, current=[], viewerList=[], viewerIndex=0, visibleCount=12, wallVisibleCount=28, wallLoading=false, suppressClick=false;
 
   function loadLocalEdits(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}')}catch(_){return {}}}
   function saveLocalEdits(){localStorage.setItem(LS_KEY, JSON.stringify(localEdits))}
@@ -409,7 +431,7 @@
     return `<div class="frame-media"><img loading="lazy" decoding="async" src="${esc(url(src))}" alt="${esc(displayTitle(a))}"></div>`;
   }
   function frameHTML(a){return `<div class="frame-wrap"><div class="frame-inner">${mediaHTML(a)}</div></div>`}
-  function wallCard(a){return `<article class="wall-piece" tabindex="0" role="button" data-id="${esc(a.id)}" aria-label="${esc(displayTitle(a))} 보기">${frameHTML(a)}<div class="wall-caption"><strong>${esc(displayTitle(a))}</strong><br><span>${esc(author(a))}</span></div></article>`}
+  function wallCard(a){return `<article class="wall-piece" tabindex="0" role="button" data-id="${esc(a.id)}" aria-label="${esc(displayTitle(a))} 보기">${frameHTML(a)}<div class="wall-caption"><strong>${esc(displayTitle(a))}</strong><br><span>${esc(author(a))}</span></div><button type="button" class="wall-open" data-open="${esc(a.id)}" aria-label="${esc(displayTitle(a))} 확대 보기">확대 보기 ↗</button></article>`}
   function archiveCard(a){
     const cs=charsOf(a); const charText=cs.length?cs.map(prettyChar).join(', '):'캐릭터 미분류';
     return `<article class="art-card" tabindex="0" role="button" data-id="${esc(a.id)}" aria-label="${esc(displayTitle(a))} 보기">${frameHTML(a)}<div class="art-meta"><h3>${esc(displayTitle(a))}</h3><div class="sub">${esc(author(a))} · ${esc(nameHall(a.category))} · ${isVideo(a)?'비디오':'이미지'}</div><div class="desc">${esc(a.description || charText)}</div></div></article>`;
@@ -440,9 +462,27 @@
   }
 
   function buildWall(){
-    const list=artworks.slice(0,18);
-    $('wall-count').textContent=`${list.length} works`;
+    wallVisibleCount=Math.max(28,Math.min(wallVisibleCount,artworks.length));
+    const list=artworks.slice(0,wallVisibleCount);
+    $('wall-count').textContent=`${artworks.length.toLocaleString('ko-KR')} works`;
     $('wall-track').innerHTML=list.length?list.map(wallCard).join(''):'<div class="empty">등록된 작품이 없습니다.</div>';
+    updateWallProgress();
+  }
+
+  function updateWallProgress(){
+    const count=Math.min(wallVisibleCount,artworks.length);
+    $('wall-progress').textContent=`전시 중 ${count.toLocaleString('ko-KR')} / 전체 ${artworks.length.toLocaleString('ko-KR')}개`;
+    $('wall-load-more').hidden=count>=artworks.length;
+  }
+
+  function appendWall(batch=28){
+    if(wallLoading||wallVisibleCount>=artworks.length)return;
+    wallLoading=true;
+    const list=artworks.slice(wallVisibleCount,wallVisibleCount+batch);
+    $('wall-track').insertAdjacentHTML('beforeend',list.map(wallCard).join(''));
+    wallVisibleCount+=list.length;
+    updateWallProgress();
+    wallLoading=false;
   }
 
   function filteredArtworks(){
@@ -571,47 +611,54 @@
   }
 
   function enableDragScroll(el){
-    // Treat pointer movement as a drag ONLY after passing a distance threshold.
-    // Do not disable child pointer events on pointerdown: doing so prevented card clicks.
-    let pointerId=null, originX=0, originY=0, originLeft=0, moved=false;
-    const finish=(e)=>{
-      if(pointerId===null) return;
-      if(e && e.pointerId!==undefined && e.pointerId!==pointerId) return;
-      const wasDrag=moved;
-      pointerId=null; moved=false;
-      el.classList.remove('dragging');
-      if(wasDrag){
-        // Suppress only the one synthetic click generated on pointer release.
-        suppressClick=true;
-        setTimeout(()=>{suppressClick=false},80);
-      }
-    };
+    // Handle CLICK on release instead of native click: some browsers suppress
+    // the native click after a draggable image or a scrolling gesture.
+    let down=null;
+    const cancel=()=>{down=null;el.classList.remove('dragging')};
+    el.addEventListener('dragstart',e=>e.preventDefault());
     el.addEventListener('pointerdown',e=>{
-      if(e.button!==0 || e.pointerType==='touch') return;
-      pointerId=e.pointerId;
-      originX=e.clientX; originY=e.clientY;
-      originLeft=el.scrollLeft;
-      moved=false;
-      // 'dragging' class must NOT be added here. The clicked image stays clickable.
+      if(e.button!==0||e.pointerType==='touch')return;
+      const article=e.target.closest('.wall-piece[data-id]');
+      down={pointer:e.pointerId,x:e.clientX,y:e.clientY,scroll:el.scrollLeft,cardId:article?.dataset.id||null,moved:false};
     });
     window.addEventListener('pointermove',e=>{
-      if(pointerId!==e.pointerId) return;
-      if((e.buttons&1)===0){finish(e);return}
-      const dx=e.clientX-originX, dy=e.clientY-originY;
-      if(!moved && Math.hypot(dx,dy)>8){
-        moved=true;
-        el.classList.add('dragging');
-      }
-      if(moved) el.scrollLeft=originLeft-dx;
+      if(!down||down.pointer!==e.pointerId)return;
+      if((e.buttons&1)===0){cancel();return}
+      const dx=e.clientX-down.x,dy=e.clientY-down.y;
+      if(Math.hypot(dx,dy)>10){down.moved=true;el.classList.add('dragging')}
+      if(down.moved)el.scrollLeft=down.scroll-dx;
     });
-    el.addEventListener('pointerup',finish);
-    el.addEventListener('pointercancel',finish);
-    window.addEventListener('pointerup',finish);
-    window.addEventListener('blur',()=>finish());
+    window.addEventListener('pointerup',e=>{
+      if(!down||down.pointer!==e.pointerId)return;
+      const record=down;
+      const far=Math.hypot(e.clientX-record.x,e.clientY-record.y)>10;
+      cancel();
+      if(!record.moved&&!far&&record.cardId){
+        suppressClick=true;
+        const selected=record.cardId;
+        openLightbox(artworks,selected);
+        setTimeout(()=>{suppressClick=false},160);
+      }else if(record.moved){
+        suppressClick=true;
+        setTimeout(()=>{suppressClick=false},160);
+      }
+    });
+    window.addEventListener('pointercancel',cancel);
+    window.addEventListener('blur',cancel);
   }
 
   function bindUI(){
-    attachClicks('wall-track',()=>artworks.slice(0,18));
+    const wallEl=$('wall-track');
+    wallEl.addEventListener('click',e=>{
+      if(suppressClick)return;
+      const c=e.target.closest('.wall-piece[data-id]');
+      if(c)openLightbox(artworks,c.dataset.id);
+    });
+    wallEl.addEventListener('keydown',e=>{
+      if(e.key!=='Enter'&&e.key!==' ')return;
+      const c=e.target.closest('.wall-piece[data-id]');
+      if(c){e.preventDefault();openLightbox(artworks,c.dataset.id)}
+    });
     attachClicks('archive-grid',()=>current);
     enableDragScroll($('wall-track'));
     // Capture wheel input for EVERY part of the museum wall, including its
@@ -635,6 +682,11 @@
       }
       // When the rail reaches either end, allow normal page scrolling.
     },{passive:false,capture:true});
+    $('wall-load-more').addEventListener('click',()=>appendWall(28));
+    $('wall-track').addEventListener('scroll',()=>{
+      const rail=$('wall-track');
+      if(rail.scrollWidth-rail.clientWidth-rail.scrollLeft<1000) appendWall(28);
+    },{passive:true});
     $('wall-prev').addEventListener('click',()=>$('wall-track').scrollBy({left:-520,behavior:'smooth'}));
     $('wall-next').addEventListener('click',()=>$('wall-track').scrollBy({left:520,behavior:'smooth'}));
     $('hall-grid').addEventListener('click',e=>{const b=e.target.closest('[data-hall]'); if(!b) return; $('hall-filter').value=b.dataset.hall; $('character-filter').value='all'; renderArchive(); document.getElementById('archive').scrollIntoView({behavior:'smooth'}); });
