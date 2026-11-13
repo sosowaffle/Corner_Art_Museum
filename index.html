@@ -141,6 +141,22 @@
     .helper{margin-top:8px;font-size:12px;color:var(--mute)}
     .message.ok{color:var(--green)} .message.err{color:var(--red)}
 
+
+    .artist-symbol{overflow:hidden;border-radius:50%;flex-shrink:0}
+    .artist-avatar{width:100%;height:100%;object-fit:cover;border-radius:50%}
+    .avatar-fallback{display:grid;place-items:center;width:100%;height:100%;font-size:25px}
+    .character-picker{display:flex;flex-wrap:wrap;gap:7px;margin-top:8px}
+    .character-picker label{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:9px;padding:7px 11px;background:#1a1a17;margin:0}
+    .character-picker input{width:auto;padding:0;margin:0;accent-color:var(--gold)}
+    .tag-info{font-size:12px;color:var(--mute);margin-top:9px}
+    .art-card{position:relative}
+    .wall-piece{cursor:pointer}
+    .wall-piece .frame-wrap{pointer-events:none}
+    .art-card .frame-wrap{pointer-events:none}
+    .lightbox{z-index:9999}
+    .stage-media.fit{align-items:center}
+    .stage-media.fit img{max-height:100%;max-width:100%;object-fit:contain}
+
     @media (max-width:1200px){
       .hero{grid-template-columns:1fr}.archive-grid,.hall-grid,.artist-grid{grid-template-columns:1fr 1fr}.filters{grid-template-columns:1fr 1fr 1fr}.filters > :first-child{grid-column:1/-1}.light-shell{grid-template-columns:1fr;overflow:auto}.stage-panel{min-height:55vh}
     }
@@ -309,6 +325,7 @@
         <div class="meta" id="detail-meta"></div>
         <div class="desc" id="detail-desc"></div>
         <div class="notice-box" id="edit-audit">등록된 제목 수정 내역이 없습니다.</div>
+        <div class="formbox"><h4>등장 캐릭터 지정</h4><div id="character-picker" class="character-picker"></div><div class="buttons" style="margin-top:12px"><button id="save-char" class="btn">이 브라우저에 분류 저장</button></div><div id="character-save-status" class="tag-info">그림에 등장하는 캐릭터를 선택해 주세요. 업로더와 캐릭터는 별개입니다. 전체 공개 분류는 AI 자동 분류 설정 또는 공용 저장소가 필요합니다.</div></div>
         <div class="notice-box local">사이트에서 바로 변경을 적용하면 <b>현재 브라우저에서만</b> 즉시 반영됩니다. 모든 방문자에게 반영하려면 GitHub 신청이 필요합니다.</div>
 
         <div class="formbox">
@@ -334,19 +351,20 @@
   const REPO='sosowaffle/Corner_Art_Museum';
   const RAW=`https://raw.githubusercontent.com/${REPO}/main/`;
   const LS_KEY='cornerMuseumLocalTitleEdits';
+  const LS_CHAR_KEY='cornerMuseumLocalCharacterTags';
   const HALLS=[
     ['corner-art','코너의 미술관'],
-    ['corner-war','코너의 전장기념관'],
-    ['corner-uhuh','코너의 으흥관'],
+    ['corner-war','코너의 전쟁기념관'],
+    ['corner-hehe','코너의 으흐흐관'],
     ['to-sosowaffle','to-소소와플'],
-    ['to-simsim','to-심심한코너'],
+    ['to-corner','to-심심한코너'],
     ['to-gangsi','to-강시'],
     ['corner-comics','코너의 만화']
   ];
   const CHARS=[
-    {id:'corner',name:'심심한 코너',symbol:'🖤'},
-    {id:'sosowaffle',name:'소소와플',symbol:'🧡'},
-    {id:'gangsi',name:'강시',symbol:'💙'}
+    {id:'corner',name:'심심한 코너',symbol:'🖤',uid:'397722270891769858'},
+    {id:'sosowaffle',name:'소소와플',symbol:'🧡',uid:'664976847402172417'},
+    {id:'gangsi',name:'강시',symbol:'💙',uid:'444120879526445066'}
   ];
   const $=id=>document.getElementById(id);
   const esc=s=>String(s??'').replace(/[&<>'"]/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","'":"&#39;","\"":"&quot;"}[m]));
@@ -358,13 +376,23 @@
   const nameHall=id=>(HALLS.find(v=>v[0]===id)||[])[1]||id||'전시관 미지정';
   const prettyChar=id=>(CHARS.find(v=>v.id===id)?.name)||'미분류';
   const author=a=>a.uploaderName||a.authorName||a.author||a.username||'작성자 미상';
-  let artworks=[], tags={}, overrides={}, localEdits={}, current=[], viewerList=[], viewerIndex=0, visibleCount=12, suppressClick=false;
+  let artworks=[], tags={}, overrides={}, localEdits={}, localTags={}, current=[], viewerList=[], viewerIndex=0, visibleCount=12, suppressClick=false;
 
   function loadLocalEdits(){try{return JSON.parse(localStorage.getItem(LS_KEY)||'{}')}catch(_){return {}}}
   function saveLocalEdits(){localStorage.setItem(LS_KEY, JSON.stringify(localEdits))}
   function mergedEdit(id){return localEdits[id] || overrides[id] || null}
   function displayTitle(a){const edit=mergedEdit(String(a.id)); return edit?.title || a.title || a.filename || a.originalFilename || 'Untitled';}
-  function charsOf(a){const t=tags[String(a.id)]; return Array.isArray(t)?t.filter(Boolean):[]}
+  function charsOf(a){
+    const aid=String(a.id);
+    const local=localTags[aid];
+    if(Array.isArray(local))return local.filter(id=>CHARS.some(c=>c.id===id));
+    const t=tags[aid];
+    const arr=Array.isArray(t)?t:(t&&Array.isArray(t.characters)?t.characters:[]);
+    return arr.filter(id=>CHARS.some(c=>c.id===id));
+  }
+  function avatarHTML(c){
+    return `<span class="artist-symbol"><img class="artist-avatar" alt="${esc(c.name)} 디스코드 프로필 사진" src="assets/avatars/${esc(c.id)}.png" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="avatar-fallback" hidden>${c.symbol}</span></span>`;
+  }
   function mediaHTML(a,forWall=false){
     const src=mediaPath(a.media||a.image); if(!src) return '<div>미디어 없음</div>';
     if(isVideo(a)){
@@ -399,7 +427,7 @@
   function initStaticUI(){
     $('year').textContent=new Date().getFullYear();
     $('hall-grid').innerHTML=HALLS.map((h,i)=>`<button class="hall-card" data-hall="${h[0]}"><small>HALL ${String(i+1).padStart(2,'0')}</small><b>${esc(h[1])}</b><span>${artworks.filter(a=>a.category===h[0]).length}개 작품 보기 →</span></button>`).join('');
-    $('artist-grid').innerHTML=CHARS.map(c=>`<button class="artist-card" data-char="${c.id}"><div class="artist-head"><span class="artist-symbol">${c.symbol}</span><span><small>CHARACTER VIEW</small><b>${esc(c.name)}</b><span>${artworks.filter(a=>charsOf(a).includes(c.id)).length}개 작품 모아보기</span></span></div></button>`).join('');
+    $('artist-grid').innerHTML=CHARS.map(c=>`<button class="artist-card" data-char="${c.id}"><div class="artist-head">${avatarHTML(c)}<span><small>CHARACTER VIEW</small><b>${esc(c.name)}</b><span>${artworks.filter(a=>charsOf(a).includes(c.id)).length}개 작품 모아보기</span></span></div></button>`).join('');
     $('hall-filter').innerHTML='<option value="all">모든 전시관</option>'+HALLS.map(h=>`<option value="${h[0]}">${esc(h[1])}</option>`).join('');
     $('character-filter').innerHTML='<option value="all">모든 캐릭터</option>'+CHARS.map(c=>`<option value="${c.id}">${esc(c.name)}</option>`).join('')+'<option value="unknown">미분류</option>';
     $('stat-count').textContent=artworks.length.toLocaleString('ko-KR');
@@ -462,6 +490,16 @@
     updateLightbox(); buildWall(); renderArchive(false);
   }
 
+  function saveCharacterLocal(){
+    const a=viewerList[viewerIndex]; if(!a)return;
+    const ids=[...$('character-picker').querySelectorAll('input:checked')].map(x=>x.value);
+    localTags[String(a.id)]=ids;
+    try{localStorage.setItem(LS_CHAR_KEY,JSON.stringify(localTags))}catch(e){$('character-save-status').textContent='브라우저 저장소 접근이 차단되어 저장되지 않았습니다.';return}
+    $('character-save-status').textContent='이 브라우저의 캐릭터 분류가 반영됐어요. 전체 방문자에게 공개되지는 않습니다.';
+    $('detail-meta').textContent=`업로드: ${fmtDate(a.createdAt)}\n캐릭터: ${(charsOf(a).map(prettyChar).join(', ')||'미분류')}`;
+    initStaticUI();renderArchive(false);
+  }
+
   function submitGitHub(){
     const a=viewerList[viewerIndex]; if(!a) return;
     const title=$('title-input').value.trim();
@@ -504,6 +542,8 @@
     $('detail-type').textContent=isVideo(a)?'비디오':'이미지';
     $('detail-meta').textContent=`업로드: ${fmtDate(a.createdAt)}\n캐릭터: ${(charsOf(a).map(prettyChar).join(', ')||'미분류')}`;
     $('detail-desc').textContent=a.description || '설명이 없는 작품입니다.';
+    $('character-picker').innerHTML=CHARS.map(c=>`<label><input type="checkbox" value="${c.id}" ${charsOf(a).includes(c.id)?'checked':''}>${c.symbol} ${esc(c.name)}</label>`).join('');
+    $('character-save-status').textContent='캐릭터와 업로더는 별도입니다. 여기서 저장한 분류는 이 브라우저에서만 유지됩니다.';
     const edit=mergedEdit(String(a.id));
     $('edit-audit').textContent=edit ? `현재 적용 중인 제목 수정: ${edit.title} · 수정자 ${edit.nickname || '기록 없음'}${edit.githubUser ? ' (@'+edit.githubUser+')' : ''}` : '등록된 제목 수정 내역이 없습니다.';
     $('title-input').value=displayTitle(a); $('nickname-input').value=''; $('edit-message').textContent=''; $('edit-message').className='message';
@@ -537,17 +577,18 @@
       const id=pointerId;
       pointerId=null; moved=false;
       el.classList.remove('dragging');
-      try{if(el.hasPointerCapture(id))el.releasePointerCapture(id)}catch(_){ }
+      // No parent pointer capture: capture would retarget ordinary artwork clicks
+      // to the rail instead of the artwork card and prevent opening the viewer.
     };
     el.addEventListener('pointerdown',e=>{
       if(e.button!==0 || e.pointerType==='touch')return;
       finish();
       pointerId=e.pointerId; startX=e.clientX; startLeft=el.scrollLeft; moved=false;
       el.classList.add('dragging');
-      // Capture pointer to get the release even outside the wall.
-      try{el.setPointerCapture(e.pointerId)}catch(_){ }
+      // Window-level move/up listeners handle release outside the wall without
+      // stealing click events from child artwork cards.
     });
-    el.addEventListener('pointermove',e=>{
+    window.addEventListener('pointermove',e=>{
       if(pointerId!==e.pointerId)return;
       if((e.buttons&1)===0){finish(e);return}
       const dx=e.clientX-startX;
@@ -584,6 +625,7 @@
     $('close-lightbox').addEventListener('click',closeLightbox); $('prev-art').addEventListener('click',()=>moveLightbox(-1)); $('next-art').addEventListener('click',()=>moveLightbox(1));
     $('fit-view').addEventListener('click',()=>{ $('stage-media').className='stage-media fit'; $('fit-view').classList.add('active'); $('scroll-view').classList.remove('active');});
     $('scroll-view').addEventListener('click',()=>{ $('stage-media').className='stage-media scroll'; $('scroll-view').classList.add('active'); $('fit-view').classList.remove('active');});
+    $('save-char').addEventListener('click',saveCharacterLocal);
     $('save-local').addEventListener('click',applyEditLocal); $('submit-github').addEventListener('click',submitGitHub);
     $('lightbox').addEventListener('click',e=>{ if(e.target === $('lightbox')) closeLightbox(); });
     document.addEventListener('keydown',e=>{ if(!$('lightbox').classList.contains('open')) return; if(e.key==='Escape') closeLightbox(); if(e.key==='ArrowLeft' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) moveLightbox(-1); if(e.key==='ArrowRight' && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) moveLightbox(1); });
@@ -591,6 +633,7 @@
 
   async function boot(){
     localEdits=loadLocalEdits();
+    try{localTags=JSON.parse(localStorage.getItem(LS_CHAR_KEY)||'{}')}catch(_){localTags={}}
     const ts=Date.now();
     try{
       const data=await getJson([`./gallery.json?v=${ts}`,`${RAW}gallery.json?v=${ts}`],true);
