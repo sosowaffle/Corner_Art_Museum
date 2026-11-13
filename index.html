@@ -63,7 +63,6 @@
     .wall-guide p{margin:0;color:#ece0cb;font-size:13px;text-shadow:0 2px 9px #000}
     .wall-track{display:flex;align-items:center;gap:56px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scrollbar-width:thin;scrollbar-color:#b7a17b6b transparent;padding:36px max(30px,8vw) 98px;cursor:grab;position:relative;z-index:3;user-select:none;touch-action:pan-y;min-height:350px}
     .wall-track.dragging{cursor:grabbing;scroll-behavior:auto!important}
-    .wall-track.dragging *{pointer-events:none}
     .wall-track img{-webkit-user-drag:none;user-drag:none}
     .wall-piece{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;min-width:230px;max-width:530px;padding:18px 12px 15px;border-inline:1px solid #c5b5951f;position:relative;filter:drop-shadow(0 14px 8px #0007)}
     .wall-piece::before{content:'';position:absolute;top:0;left:50%;transform:translateX(-50%);width:135px;height:23px;border-radius:50%;background:radial-gradient(ellipse at 50% 5%,#fff7c3b5,#e8c98938 35%,transparent 72%);filter:blur(4px);pointer-events:none}
@@ -572,37 +571,41 @@
   }
 
   function enableDragScroll(el){
-    // Only drag while the pointer button is physically down. Release immediately on up/cancel/blur,
-    // and use a window-level fallback so releasing OUTSIDE the gallery never leaves a stuck drag.
-    let pointerId=null, startX=0, startLeft=0, moved=false;
+    // Treat pointer movement as a drag ONLY after passing a distance threshold.
+    // Do not disable child pointer events on pointerdown: doing so prevented card clicks.
+    let pointerId=null, originX=0, originY=0, originLeft=0, moved=false;
     const finish=(e)=>{
       if(pointerId===null) return;
       if(e && e.pointerId!==undefined && e.pointerId!==pointerId) return;
-      if(moved){suppressClick=true;setTimeout(()=>{suppressClick=false},180)}
-      const id=pointerId;
+      const wasDrag=moved;
       pointerId=null; moved=false;
       el.classList.remove('dragging');
-      // No parent pointer capture: capture would retarget ordinary artwork clicks
-      // to the rail instead of the artwork card and prevent opening the viewer.
+      if(wasDrag){
+        // Suppress only the one synthetic click generated on pointer release.
+        suppressClick=true;
+        setTimeout(()=>{suppressClick=false},80);
+      }
     };
     el.addEventListener('pointerdown',e=>{
-      if(e.button!==0 || e.pointerType==='touch')return;
-      finish();
-      pointerId=e.pointerId; startX=e.clientX; startLeft=el.scrollLeft; moved=false;
-      el.classList.add('dragging');
-      // Window-level move/up listeners handle release outside the wall without
-      // stealing click events from child artwork cards.
+      if(e.button!==0 || e.pointerType==='touch') return;
+      pointerId=e.pointerId;
+      originX=e.clientX; originY=e.clientY;
+      originLeft=el.scrollLeft;
+      moved=false;
+      // 'dragging' class must NOT be added here. The clicked image stays clickable.
     });
     window.addEventListener('pointermove',e=>{
-      if(pointerId!==e.pointerId)return;
+      if(pointerId!==e.pointerId) return;
       if((e.buttons&1)===0){finish(e);return}
-      const dx=e.clientX-startX;
-      if(Math.abs(dx)>5)moved=true;
-      if(moved)el.scrollLeft=startLeft-dx;
+      const dx=e.clientX-originX, dy=e.clientY-originY;
+      if(!moved && Math.hypot(dx,dy)>8){
+        moved=true;
+        el.classList.add('dragging');
+      }
+      if(moved) el.scrollLeft=originLeft-dx;
     });
     el.addEventListener('pointerup',finish);
     el.addEventListener('pointercancel',finish);
-    el.addEventListener('lostpointercapture',finish);
     window.addEventListener('pointerup',finish);
     window.addEventListener('blur',()=>finish());
   }
@@ -611,11 +614,14 @@
     attachClicks('wall-track',()=>artworks.slice(0,18));
     attachClicks('archive-grid',()=>current);
     enableDragScroll($('wall-track'));
-    // Listen on the WHOLE museum wall (capture phase), including frame images,
-    // captions, museum lights and the space above the rail.
+    // Capture wheel input for EVERY part of the museum wall, including its
+    // upper instruction strip, artwork images and decorative overlays.
+    // The pointer-position check also handles elements with unusual stacking.
     const museumWall=document.querySelector('.museum-wall');
-    museumWall.addEventListener('wheel',e=>{
-      if(e.ctrlKey) return; // preserve browser zoom gesture
+    document.addEventListener('wheel',e=>{
+      if(e.ctrlKey || !museumWall) return;
+      const rect=museumWall.getBoundingClientRect();
+      if(e.clientX<rect.left || e.clientX>rect.right || e.clientY<rect.top || e.clientY>rect.bottom) return;
       const rail=$('wall-track');
       const max=Math.max(0,rail.scrollWidth-rail.clientWidth);
       if(max<1) return;
@@ -625,10 +631,9 @@
       const next=Math.max(0,Math.min(max,before+delta*factor));
       if(Math.abs(next-before)>0.5){
         e.preventDefault();
-        e.stopPropagation();
         rail.scrollLeft=next;
       }
-      // At the first/last frame, let vertical scrolling continue naturally.
+      // When the rail reaches either end, allow normal page scrolling.
     },{passive:false,capture:true});
     $('wall-prev').addEventListener('click',()=>$('wall-track').scrollBy({left:-520,behavior:'smooth'}));
     $('wall-next').addEventListener('click',()=>$('wall-track').scrollBy({left:520,behavior:'smooth'}));
