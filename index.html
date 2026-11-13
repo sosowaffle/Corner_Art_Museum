@@ -390,9 +390,27 @@
     const arr=Array.isArray(t)?t:(t&&Array.isArray(t.characters)?t.characters:[]);
     return arr.filter(id=>CHARS.some(c=>c.id===id));
   }
-  function avatarHTML(c){
-    return `<span class="artist-symbol"><img class="artist-avatar" alt="${esc(c.name)} 디스코드 프로필 사진" src="assets/avatars/${esc(c.id)}.png" onerror="this.hidden=true;this.nextElementSibling.hidden=false"><span class="avatar-fallback" hidden>${c.symbol}</span></span>`;
-  }
+ 
+function avatarHTML(c) {
+  const avatarURL =
+    `https://raw.githubusercontent.com/sosowaffle/Corner_Art_Museum/main/assets/avatars/${c.id}.png`;
+
+  return `
+    <span class="artist-symbol">
+      <img
+        class="artist-avatar"
+        src="${avatarURL}"
+        alt="${esc(c.name)} 프로필 사진"
+        loading="lazy"
+        onerror="this.hidden=true;this.nextElementSibling.hidden=false"
+      >
+      <span class="avatar-fallback" hidden>
+        ${c.symbol}
+      </span>
+    </span>
+  `;
+}
+
   function mediaHTML(a,forWall=false){
     const src=mediaPath(a.media||a.image); if(!src) return '<div>미디어 없음</div>';
     if(isVideo(a)){
