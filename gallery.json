@@ -1,7 +1,39 @@
 {
   "demo": false,
-  "updatedAt": "2026-11-12T23:33:06.222411+00:00",
+  "updatedAt": "2026-11-13T07:59:15.300262+00:00",
   "artworks": [
+    {
+      "id": "1570523212805181460-1570701270883368990-1570701270594101379",
+      "title": "미안하다 그냥 내가 만들고 싶었다 2화",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-comics",
+      "channelName": "코너의 만화",
+      "createdAt": "2026-11-13T07:26:05.197000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1570523212805181460-1570701270883368990-1570701270594101379.png",
+      "image": "assets/artworks/1570523212805181460-1570701270883368990-1570701270594101379.png",
+      "messageUrl": ""
+    },
+    {
+      "id": "1570523212805181460-1570689966160478248-1570689965824680047",
+      "title": "미안하다 그냥 내가 만들고 싶었다 1화",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-comics",
+      "channelName": "코너의 만화",
+      "createdAt": "2026-11-13T06:41:09.941000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1570523212805181460-1570689966160478248-1570689965824680047.png",
+      "image": "assets/artworks/1570523212805181460-1570689966160478248-1570689965824680047.png",
+      "messageUrl": ""
+    },
     {
       "id": "1570523212805181460-1570540947379323013-1570540947014426734",
       "title": "이제까지 생성한 만화중에 제일 완성도 높으면서 제일 프롬프트 길게쓴듯",
