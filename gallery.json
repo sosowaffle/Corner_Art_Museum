@@ -1,7 +1,39 @@
 {
   "demo": false,
-  "updatedAt": "2026-11-18T23:26:38.964732+00:00",
+  "updatedAt": "2026-11-19T04:19:02.914818+00:00",
   "artworks": [
+    {
+      "id": "1570523212805181460-1572818257319174338-1572818257105391706",
+      "title": "XX대학 전시회에 간 김코너",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-comics",
+      "channelName": "코너의 만화",
+      "createdAt": "2026-11-19T03:38:14.095000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1570523212805181460-1572818257319174338-1572818257105391706.png",
+      "image": "assets/artworks/1570523212805181460-1572818257319174338-1572818257105391706.png",
+      "messageUrl": ""
+    },
+    {
+      "id": "1535642301907345448-1572810348296143041-1572810347859939398",
+      "title": "맥시마이저 맥시마이저~",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-art",
+      "channelName": "코너의_미술관",
+      "createdAt": "2026-11-19T03:06:48.437000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1535642301907345448-1572810348296143041-1572810347859939398.png",
+      "image": "assets/artworks/1535642301907345448-1572810348296143041-1572810347859939398.png",
+      "messageUrl": ""
+    },
     {
       "id": "1535642301907345448-1572692849873522708-1572692848980000951",
       "title": "너무 어이가없어 굴욕적인 와플낭자",
