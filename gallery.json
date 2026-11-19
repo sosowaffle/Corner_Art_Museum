@@ -1,7 +1,39 @@
 {
   "demo": false,
-  "updatedAt": "2026-11-19T13:32:03.804007+00:00",
+  "updatedAt": "2026-11-19T21:45:27.462691+00:00",
   "artworks": [
+    {
+      "id": "1535642301907345448-1573050696985616505-1573050696704462990",
+      "title": "소소와플 도제찰사",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-art",
+      "channelName": "코너의_미술관",
+      "createdAt": "2026-11-19T19:01:52.030000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1535642301907345448-1573050696985616505-1573050696704462990.png",
+      "image": "assets/artworks/1535642301907345448-1573050696985616505-1573050696704462990.png",
+      "messageUrl": ""
+    },
+    {
+      "id": "1535642301907345448-1573036082881237032-1573036082608611388",
+      "title": "육지에 상륙하는 김코너",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-art",
+      "channelName": "코너의_미술관",
+      "createdAt": "2026-11-19T18:03:47.756000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1535642301907345448-1573036082881237032-1573036082608611388.png",
+      "image": "assets/artworks/1535642301907345448-1573036082881237032-1573036082608611388.png",
+      "messageUrl": ""
+    },
     {
       "id": "1535642301907345448-1572933999360213012-1572933999037255690",
       "title": "신하와플",
