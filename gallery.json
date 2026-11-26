@@ -1,7 +1,39 @@
 {
   "demo": false,
-  "updatedAt": "2026-11-26T10:49:48.774592+00:00",
+  "updatedAt": "2026-11-26T19:53:09.894491+00:00",
   "artworks": [
+    {
+      "id": "1535642301907345448-1575524038791532667-1575524038502121697",
+      "title": "(전시를 못가게 되니 풀버전으로 올림) 책에서 만난 소소와플",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-art",
+      "channelName": "코너의_미술관",
+      "createdAt": "2026-11-26T14:50:02.669000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1535642301907345448-1575524038791532667-1575524038502121697.jpg",
+      "image": "assets/artworks/1535642301907345448-1575524038791532667-1575524038502121697.jpg",
+      "messageUrl": ""
+    },
+    {
+      "id": "1535642301907345448-1575523398803652808-1575523398455656468",
+      "title": "놀란 와플",
+      "description": "",
+      "authorId": "corner",
+      "authorName": "심심한 코너",
+      "uploaderId": "397722270891769858",
+      "uploaderName": "Connor",
+      "category": "corner-art",
+      "channelName": "코너의_미술관",
+      "createdAt": "2026-11-26T14:47:30.084000+00:00",
+      "mediaType": "image",
+      "media": "assets/artworks/1535642301907345448-1575523398803652808-1575523398455656468.jpg",
+      "image": "assets/artworks/1535642301907345448-1575523398803652808-1575523398455656468.jpg",
+      "messageUrl": ""
+    },
     {
       "id": "1535642301907345448-1575408133533212753-1575408133168439448",
       "title": "책에서 만난 소소와플(하얀색칠은 개인정보 보호)",
